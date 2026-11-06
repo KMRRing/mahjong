@@ -44,7 +44,7 @@ let opts = { flowers: true, minFan: 3, rounds: 1, scoring: "fan", coach: "on", p
 // steady pace, numbered tiles, one row, no full screen: whatever an older save chose. A game in hand keeps its own rules
 // (G.opts, in the run). The computer's strength is the hidden ramp (below); the old saved choice is its first step.
 const OLD_BOTS = opts.bots;
-Object.assign(opts, { flowers: true, minFan: 3, rounds: 1, scoring: "fan", pace: "steady", numbers: true, rows: "one", full: false });
+Object.assign(opts, { flowers: true, minFan: 3, rounds: 1, scoring: "fan", pace: "steady", rows: "one", full: false });
 const VIEWS = [["flat", "Table"], ["3d", "Angled"], ["gl", "3D"]];       // the table drawn flat (hong.js), seen at an angle (hong-3d.js, CSS), or a real 3D scene (hong-gl.js)
 // opts.view is kept only when the player chose (else the suite's default, mode3d.js); "table" was the old default written into every save
 if (!VIEWS.some(([k]) => k === opts.view)) delete opts.view;
@@ -1223,6 +1223,7 @@ function openMenu() {
   const cp = progressOf("hong", COURSE);
   part(body, "play").append(action(cp.done ? `Learn: ${cp.done} of ${cp.of} lessons done` : "Learn Mahjong, from the rules", () => course.open()));
   part(body, "settings").append(
+    toggle("Tile labels", opts.numbers !== false, v => set("numbers", v)),
     toggle("Play in 2D (saves battery)", viewNow() !== "gl", v => set("view", v ? "3d" : "gl")),
     ...(viewNow() === "gl" ? [action("Reset camera", () => table3d.resetView())] : [choice("2D layout", VIEWS.slice(0, 2), viewNow(), v => set("view", v))]),
     ...(together.room && S?.host != null && S.host !== mySlot()
@@ -1472,7 +1473,7 @@ const course = createCourse({
 installTiles();
 table3d = createTable3d({
   state: () => G, me: () => me, nameOf, meldTiles, busy: () => busyWith, quiet: IN_FRAME,
-  gl: () => viewNow() === "gl", glFailed: () => { opts.view = "3d"; write(OPTS, opts); applyLook(); toast("3D needs WebGL, which this device doesn't have; showing the angled table."); },
+  gl: () => viewNow() === "gl", labels: () => opts.numbers !== false, glFailed: () => { opts.view = "3d"; write(OPTS, opts); applyLook(); toast("3D needs WebGL, which this device doesn't have; showing the angled table."); },
   cap: () => Math.min(handSize([]).tw, 2.4 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16)),
   headerOver, answering: () => !!G && E.legal(G, me).some(a => a.t !== "pass"),
   hand: () => [...$("hand").querySelectorAll(".hk-tile")], melds: () => [...$("hand").querySelectorAll(".hk-meld")],
