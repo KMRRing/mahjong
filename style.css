@@ -1,0 +1,985 @@
+/* Archivo, served from here so the games look right offline (the same variable font Google Fonts serves:
+   weight 100-900, width 62-125%). */
+@font-face { font-family: "Archivo"; font-style: normal; font-display: swap; font-weight: 100 900; font-stretch: 62% 125%;
+  src: url("fonts/archivo-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Archivo"; font-style: normal; font-display: swap; font-weight: 100 900; font-stretch: 62% 125%;
+  src: url("fonts/archivo-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --caps: uppercase; --track: 1; --stretch-btn: 112%;   /* the Deco lettering; the other themes reset these */
+  --gap: .375rem;             /* between tiles, and between solved crates */
+  --tile-ratio: .8;       /* tile height / width */
+  /* Codex's look: brass instruments on a codex's page. Light is the page (parchment, navy ink, brass rules);
+     dark is the instrument (a night-navy dial, parchment lettering, bright brass). The four crate colours are
+     enamels: ochre, verdigris (copper's green patina), cobalt and oxblood. */
+  --yard: #E8DFC9;      /* the page */
+  --ink: #1C2A34;       /* navy ink */
+  --ink-soft: #5C5545;
+  --tile: #FBF8F0;      /* a tile: paper, with a brass edge */
+  --tile-edge: #C2AE82;
+  --c0: #D49A22;        /* ochre     */
+  --c1: #3D7A66;        /* verdigris */
+  --c2: #2C5B8A;        /* cobalt    */
+  --c3: #8F3328;        /* oxblood   */
+  --on-c0: #2A2005;
+  --on-c: #F7F1E3;
+  --sheet: #F5EFE1;     /* paper: cards and dialogs */
+  --brass: #A47528;     /* lines, frames and rules */
+  --brass-hi: #E2B865;  /* gilt lettering on navy */
+  --brass-lo: #7A5518;  /* brass that has to read as text on the page */
+  --rule: #CDB98C;      /* hairlines */
+  --plate: #1C2A34;     /* a primary button: a navy plate lettered in gilt */
+  --plate-ink: #E2B865;
+  --focus: #A47528;
+  --p0: #2C5B8A;        /* player colours: cobalt and copper; at a party's table, verdigris, plum, ochre and olive too */
+  --p1: #B4632A;
+  --p2: #2F7D5B;
+  --p3: #7E3F7A;
+  --p4: #9A7420;
+  --p5: #5E6A1F;
+  --learn: #3D7A66;     /* learning mode: verdigris */
+  --logo-edge: #7A5518; /* every game's logo: brass wire round an enamel, as in cloisonné */
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --wide: 125%;         /* headings: Archivo at its widest, in spaced capitals (the Deco signage look) */
+  --cr-logo-tint: #F0D9A6;  /* Crates' logo: a crate */
+  --cr-logo-edge: var(--logo-edge);
+  --sl-logo-tint: #D4DBE0;  /* Slate's logo: a certificate of analysis */
+  --sl-logo-edge: var(--logo-edge);
+  --d-logo-tint: #CBE3DA;   /* Delta's logo: a hex with a delta in it */
+  --d-logo-edge: var(--logo-edge);
+  --pt-logo-tint: #CFE2D2;  /* Punt's logo: a betting chip */
+  --pt-logo-edge: var(--logo-edge);
+  --ch-logo-tint: #D2DEEA;  /* Chart's logo: a map pin */
+  --ch-logo-edge: var(--logo-edge);
+  --sv-logo-tint: #EFDDC1;  /* Survey's logo: a grid with ore */
+  --sv-logo-edge: var(--logo-edge);
+  --bl-logo-tint: #E0E7C8;  /* Blend's logo: a flask */
+  --bl-logo-edge: var(--logo-edge);
+  --rf-logo-tint: #D5E0E8;  /* Refinery's logo: a distillation column */
+  --rf-logo-edge: var(--logo-edge);
+  --pa-logo-tint: #CFE7E2;  /* Parley's logo: two speech marks */
+  --pa-logo-edge: var(--logo-edge);
+  --hb-logo-tint: #D6DCEB;  /* Harbour's logo: a tanker from above */
+  --hb-logo-edge: var(--logo-edge);
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode="day"]) {
+    --yard: #10181F;    /* the dial at night */
+    --ink: #ECE2CB;     /* parchment lettering */
+    --ink-soft: #A99E86;
+    --tile: #1E2A35;
+    --tile-edge: #4E4128;
+    --sheet: #1A2530;
+    --brass: #C99A45;
+    --brass-hi: #E9C47C;
+    --brass-lo: #D9AF62;
+    --rule: #3E3524;
+    --plate: #C99A45;   /* a brass plate lettered in navy */
+    --plate-ink: #10181F;
+    --focus: #E9C47C;
+    --p0: #6FA0D2;
+    --p1: #E0965A;
+    --p2: #7FC2A8;
+    --p3: #C98BC3;
+    --p4: #D9B45C;
+    --p5: #B4BF6A;
+    --learn: #7FC2A8;
+    --logo-edge: #D9AF62;
+    --cr-logo-tint: #5A4317;
+    --sl-logo-tint: #2E3B46;
+    --d-logo-tint: #1F4A42;
+    --pt-logo-tint: #23432F;
+    --ch-logo-tint: #1E3A55;
+    --sv-logo-tint: #4D3818;
+    --bl-logo-tint: #39431A;
+    --rf-logo-tint: #263D50;
+    --pa-logo-tint: #1B4440;
+    --hb-logo-tint: #23304F;
+  }
+}
+/* night, set in Settings */
+html[data-mode="night"] {
+    --yard: #10181F;    /* the dial at night */
+    --ink: #ECE2CB;     /* parchment lettering */
+    --ink-soft: #A99E86;
+    --tile: #1E2A35;
+    --tile-edge: #4E4128;
+    --sheet: #1A2530;
+    --brass: #C99A45;
+    --brass-hi: #E9C47C;
+    --brass-lo: #D9AF62;
+    --rule: #3E3524;
+    --plate: #C99A45;   /* a brass plate lettered in navy */
+    --plate-ink: #10181F;
+    --focus: #E9C47C;
+    --p0: #6FA0D2;
+    --p1: #E0965A;
+    --p2: #7FC2A8;
+    --p3: #C98BC3;
+    --p4: #D9B45C;
+    --p5: #B4BF6A;
+    --learn: #7FC2A8;
+    --logo-edge: #D9AF62;
+    --cr-logo-tint: #5A4317;
+    --sl-logo-tint: #2E3B46;
+    --d-logo-tint: #1F4A42;
+    --pt-logo-tint: #23432F;
+    --ch-logo-tint: #1E3A55;
+    --sv-logo-tint: #4D3818;
+    --bl-logo-tint: #39431A;
+    --rf-logo-tint: #263D50;
+    --pa-logo-tint: #1B4440;
+    --hb-logo-tint: #23304F;
+  }
+*, *::before, *::after { box-sizing: inherit; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--yard); color: var(--ink); }
+/* The screen doesn't move under your thumb: no page scroll and no rubber band (dragging used to stretch the gap between
+   the header and the game). What's long scrolls inside its own box: a dialog, a list, or, on a page whose game is
+   taller than the screen, the app itself, still without the bounce. */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body > #app { max-height: 100%; box-sizing: border-box; overflow-y: auto; overscroll-behavior: none; }
+* { touch-action: manipulation; }   /* no double-tap zoom anywhere (phones only honour this on the touched element itself); pinch still works */
+input, textarea, select { font-size: max(1em, 16px); }   /* iPhones zoom into a field smaller than 16px when it's focused */
+body { font-family: var(--font); font-size: 1.0625rem; line-height: 1.4; font-weight: 500; -webkit-text-size-adjust: 100%; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+#app { max-width: 34rem; margin: 0 auto; padding: 1.1rem 1rem 2rem; }
+
+/* Bigger screens. The phone held upright is the design, and matches none of the queries below, so it looks as it
+   always has. Sizes are in rem wherever they should grow with the screen (borders and hairlines stay in px).
+   - A tablet held upright draws the phone's layout larger: the root's font size, and with it every rem, grows until
+     the screen holds the layout as a large phone does, 35rem across and 50rem down (an 11-inch iPad, 1.46 times), so
+     the board, the type and the buttons fill the screen together instead of a phone's column standing in its middle.
+   - Held sideways (a tablet, a computer's window, a phone turned over), the root grows with the height alone, and a
+     game lays its parts out beside its board, in its own stylesheet under the third query: #app.beside sets the frame
+     (the header across the top, the board's column taking what the side column, --beside wide, leaves). */
+@media (orientation: portrait) and (min-width: 600px) and (min-height: 860px) {
+  html { font-size: clamp(16px, min(100vw / 35, 100vh / 50), 26px); font-size: clamp(16px, min(100vw / 35, 100svh / 50), 26px); }
+}
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
+  html { font-size: clamp(16px, 100vh / 50, 24px); font-size: clamp(16px, 100svh / 50, 24px); }
+}
+@media (orientation: landscape) and (min-width: 700px) {
+  /* "html" outranks a game's own #app.<game> { display: flex }; a game tunes the frame through --beside (the side
+     column's width), --beside-gap, or --beside-cols (columns of its own), and places its parts with grid-row and
+     grid-column */
+  html #app.beside { display: grid; grid-template-columns: var(--beside-cols, minmax(0, 1fr) var(--beside, 22rem)); column-gap: var(--beside-gap, 2rem);
+    align-content: stretch; max-width: 84rem; height: 100vh; height: 100svh; min-height: 0; overflow: hidden; box-sizing: border-box;
+    padding-left: max(1rem, env(safe-area-inset-left, 0px)); padding-right: max(1rem, env(safe-area-inset-right, 0px));
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + .8rem); }
+  html #app.beside > .top { grid-column: 1 / -1; }
+  html #app.full > .full-pull { margin-top: 0; min-height: 0; padding: 0; }      /* the band is a row of its own across the top */
+  html #app.beside > * { min-width: 0; }
+  /* #app.wide: the whole width as one column, for a game whose card divides itself (Quote's question and market) */
+  html #app.wide { max-width: 84rem; padding-left: max(1rem, env(safe-area-inset-left, 0px)); padding-right: max(1rem, env(safe-area-inset-right, 0px)); }
+}
+/* a phone on its side is too short for every game's parts: what doesn't fit scrolls inside the app, as it always
+   has there, rather than being cut off */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 500px) {
+  html #app.beside, html #app.wide { overflow-y: auto; overscroll-behavior: contain; }
+}
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding-bottom: .6rem;
+  background: linear-gradient(var(--brass), var(--brass)) left bottom / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--brass) 0 1px, transparent 1px 9px) left bottom / 100% 5px no-repeat; }
+/* The header never pushes its right-hand buttons off the screen: they keep their size, and the title side gives way,
+   only the partner pill in it shrinking (to "…"); the game's name and icon stay whole. */
+.mark {
+  display: flex; align-items: center; gap: .55rem; margin: 0; min-width: 0; flex: 0 1 auto;
+  font-size: 1.16rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); line-height: 1;
+}
+.mark-icon { width: 2.5rem; height: 2.5rem; flex: none; }   /* the game's logo: as large as the mark across the header */
+.cr-mark { display: inline-block; }
+.cr-mark svg { width: 100%; height: 100%; display: block; }
+/* The title opens the game switcher. */
+.mark-btn { display: flex; align-items: center; gap: .55rem; min-width: 0; max-width: 100%; background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+/* The game switcher: a full screen of games, a tile each, three across on a phone, more on a wider screen. Every game
+   is on it: the screen itself never scrolls, the tiles do, in their own box under the head, when they don't all fit;
+   when they do (a tablet), they share the height. Their logos and names size themselves to the tile. */
+dialog.apps {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; border-radius: 0;
+  box-sizing: border-box; padding: calc(env(safe-area-inset-top, 0px) + 1rem) 1rem calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  background: var(--yard); color: var(--ink); overflow: hidden; overscroll-behavior: contain;
+}
+dialog.apps::backdrop { background: var(--yard); }
+dialog.apps[open] { animation: apps-in .16s ease-out; }
+@keyframes apps-in { from { opacity: 0; transform: scale(.985); } }
+@media (prefers-reduced-motion: reduce) { dialog.apps[open] { animation: none; } }
+.apps-inner { max-width: 46rem; height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+dialog.apps .pick-head h2 { font-size: 1.4rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.14em * var(--track)); text-transform: var(--caps); }
+.apps-actions { display: flex; gap: .45rem; }
+.apps-brand { display: flex; align-items: center; justify-content: center; gap: calc(.22em * var(--track)); margin: 0 0 .7rem; padding-bottom: .65rem;
+  font-size: 1.45rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.22em * var(--track)); text-transform: var(--caps); line-height: 1;
+  background: linear-gradient(var(--brass), var(--brass)) left bottom / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--brass) 0 1px, transparent 1px 9px) left bottom / 100% 5px no-repeat; }
+.apps-brand img { width: 2rem; height: 2rem; display: block; }
+/* the games in their sections (Learning, Puzzles, Board games, Cards & dice, Party), one list that scrolls in its own box */
+.apps-list { list-style: none; padding: 0; margin: .8rem 0 0; display: flex; flex-direction: column; gap: 1.1rem;
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  /* an edge with more tiles past it fades out (apps.js marks which) */
+  --fade-top: 0rem; --fade-bottom: 0rem;
+  -webkit-mask-image: linear-gradient(transparent, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent);
+  mask-image: linear-gradient(transparent, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent); }
+.apps-list.more-above { --fade-top: 1.25rem; }
+.apps-list.more-below { --fade-bottom: 2.25rem; }
+.apps-sec { display: flex; align-items: center; gap: .6rem; margin: 0 0 .5rem; font-size: .7rem; font-weight: 800; font-stretch: var(--wide);
+  letter-spacing: calc(.16em * var(--track)); text-transform: var(--caps); color: var(--brass-lo); }
+.apps-sec::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.apps-sec-star { flex: none; width: .8rem; height: .8rem; margin-right: -.2rem; fill: var(--brass); stroke: var(--brass-lo); stroke-width: 1.6; stroke-linejoin: round; }
+.apps-grid { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 5.5rem; }
+@media (min-width: 36rem) { .apps-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+/* six across only on a screen held sideways: upright, a tablet keeps four, its tiles about as square as a phone's */
+@media (min-width: 46rem) and (orientation: landscape) {
+  .apps-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .apps-inner { max-width: 84rem; }
+}
+.apps-list li { min-height: 0; }
+.apps-list > li { flex: none; }                       /* a section keeps its height: the list scrolls, it doesn't squeeze them */
+.app-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; height: 100%; min-height: 0;
+  box-sizing: border-box; padding: .4rem; border-radius: 6px; text-decoration: none; color: var(--ink); background: var(--sheet);
+  border: 1px solid var(--tile-edge); outline: 1px solid var(--rule); outline-offset: -5px; text-align: center; container-type: size; overflow: hidden; }
+.app-row.cur { border: 2px solid var(--brass); }
+.app-logo { flex: none; width: min(3.4rem, 48cqh); height: min(3.4rem, 48cqh); display: grid; place-items: center; }
+.app-logo svg { width: 94%; height: 94%; }
+/* the logos' contours (apps.js draws each at its width times --wire): as drawn, and heavier on the selected game (the one
+   you're in, or a tile under your finger or pointer); the engraved detail inside keeps its fine weight */
+.app-logo, .mark-icon { --wire: 1; }
+.app-row.cur .app-logo, .app-row:hover .app-logo, .app-row:active .app-logo, .app-row:focus-visible .app-logo { --wire: 1.5; }
+.app-logo svg *, .mark-icon svg * { transition: stroke-width .15s ease; }
+.app-name { font-size: clamp(.66rem, 13cqh, .86rem); font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.1em * var(--track)); text-transform: var(--caps); line-height: 1.1; }
+/* a tablet's tiles are larger than a phone's: the logos and names grow into them (a phone's stop at their tile's height) */
+@media (min-width: 600px) and (min-height: 600px) {
+  .apps-grid { grid-auto-rows: 5.4rem; }
+  .app-logo { width: min(4.8rem, 48cqh); height: min(4.8rem, 48cqh); }
+  .app-name { font-size: clamp(.66rem, 13cqh, 1.05rem); }
+}
+/* the game you're playing: a small play mark on the top-right corner of its icon */
+.app-logo { position: relative; }
+.app-now {
+  position: absolute; top: -.3125rem; right: -.5rem; width: .9375rem; height: .9375rem; border-radius: 50%;
+  background: var(--brass); box-shadow: 0 0 0 2px var(--sheet); pointer-events: none;   /* ringed in the tile's own colour */
+}
+.app-now::after {                                   /* the play triangle */
+  content: ""; position: absolute; left: .34375rem; top: .25rem; border-style: solid;
+  border-width: 3.5px 0 3.5px 5.5px; border-color: transparent transparent transparent var(--yard);
+}
+/* A star on each tile (games-bar.js): a favourite goes to the head of its section. The tile is an <li> so the star can sit
+   beside its link, in the tile's top corner, with a hit area of its own. */
+dialog.apps .app-tile { position: relative; }
+.app-star { position: absolute; top: .1rem; right: .1rem; z-index: 1; width: 2.25rem; height: 2.25rem; display: grid; place-items: center;
+  padding: 0; margin: 0; background: none; border: 0; border-radius: 6px; color: var(--ink-soft); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.app-star svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; opacity: .5; transition: opacity .15s ease; }
+.app-star:hover svg, .app-star:focus-visible svg { opacity: 1; }
+.app-star[aria-pressed="true"] svg { fill: var(--brass); stroke: var(--brass-lo); opacity: 1; }
+/* Search and filter on the games screen (games-bar.js): out of sight until the list is pulled down from its very top, then
+   above the list, which gives up the room (the page itself never scrolls). The row grows from nothing, so a pull that
+   reverses halfway reverses it; inert and hidden while it is away, so nothing in it can be tabbed to or read out. */
+.apps-find { flex: none; display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .2s ease, visibility 0s .2s; }
+.apps-find.on { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows .2s ease, visibility 0s; }
+.apps-find-in { min-height: 0; overflow: hidden; margin: 0 -.25rem; padding: 0 .25rem; }       /* the sides leave room for a focus ring */
+.find-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .5rem; padding: .7rem 0 .25rem; }
+.find-field { grid-column: 1 / -1; position: relative; display: block; }
+.find-field input { width: 100%; box-sizing: border-box; min-height: 2.5rem; margin: 0; padding: .45rem 2.5rem; border: 1.5px solid var(--tile-edge); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); -webkit-appearance: none; appearance: none; }
+.find-field input::placeholder { color: var(--ink-soft); }
+.find-field input:focus, .find-pick select:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+.find-field input::-webkit-search-cancel-button, .find-field input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.find-ico { position: absolute; left: .8rem; top: 50%; width: 1.1rem; height: 1.1rem; margin-top: -.55rem; fill: none; stroke: var(--ink-soft);
+  stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.find-x { position: absolute; right: 0; top: 0; width: 2.5rem; height: 100%; display: grid; place-items: center; padding: 0; background: none; border: 0;
+  color: var(--ink-soft); cursor: pointer; }
+.find-x[hidden] { display: none; }
+.find-x svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.find-pick { position: relative; display: block; min-width: 0; }
+.find-pick select { width: 100%; box-sizing: border-box; min-height: 2.5rem; margin: 0; padding: .4rem 2rem .4rem .75rem; border: 1.5px solid var(--tile-edge); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); font-weight: 700; -webkit-appearance: none; appearance: none; text-overflow: ellipsis; cursor: pointer; }
+.find-chev { position: absolute; right: .8rem; top: 50%; width: .75rem; height: .75rem; margin-top: -.375rem; fill: none; stroke: var(--ink-soft);
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.find-field.set input, .find-pick.set select { border-color: var(--brass); }                  /* a search or filter in force */
+.find-pick.set select { background: color-mix(in srgb, var(--brass) 12%, var(--sheet)); }
+@media (min-width: 36rem) {                                                                   /* room for one row */
+  .find-body { grid-template-columns: minmax(0, 1fr) 10rem 10rem; }
+  .find-field { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .apps-find, .apps-find.on { transition: none; } }
+.apps-none { text-align: center; color: var(--ink-soft); padding: 1.25rem 0; }
+.apps-none[hidden] { display: none; }
+.apps-none p { margin: 0 0 .6rem; }
+/* Settings, a popup over the screen of games */
+dialog.apps-pop { width: min(92vw, 28rem); max-height: 80vh; box-sizing: border-box; margin: auto; padding: 1rem; border: 1.5px solid var(--brass); border-radius: 10px;
+  background: var(--sheet); color: var(--ink); box-shadow: 0 18px 50px rgba(0, 0, 0, .25); overflow-y: auto; overscroll-behavior: contain; }
+dialog.apps-pop::backdrop { background: rgba(10, 14, 18, .45); }
+dialog.apps-pop .pick-head h2 { font-size: 1.05rem; }
+.top-right { display: flex; align-items: center; gap: .45rem; flex: none; }
+/* Full screen (CLAUDE.md, "Full screen"; menu.js): #app.full has no title bar. The header is only a quiet band that keeps
+   the picture clear of the one button on the screen, the menu's, fixed at the top right inside the safe area; the title,
+   the partner's pill, the Rules/Learn buttons and the dropdowns are out of sight, and their work is in the menu (Back to
+   menu first). A thin row of live status (score, time, lives) sits in that band beside the button: .full-pull. A picture
+   that wants the whole screen leaves the band out too: .full.over. */
+#app.full { --full-btn: 2.5rem; --full-edge: .5rem; --full-band: 2.75rem; --full-slot: 3.25rem; padding-top: calc(env(safe-area-inset-top, 0px) + .5rem); }   /* --full-slot: what a row beside the button leaves for it */                                 /* Modern's button is the word Menu */
+#app.full > .top { height: var(--full-band); padding: 0; margin: 0; background: none !important; border: 0 !important; }
+/* what the header showed besides buttons (a clock, lives) stays, in a row with the mark; buttons and dropdowns go to the menu */
+#app.full > .top > .mark, #app.full > .top .top-right > :is(button:not(#menuBtn), select, .dd, .dd-list) { display: none !important; }
+#app.full > .top .top-right { position: fixed; z-index: 20; height: var(--full-btn); gap: .6rem;
+  top: calc(env(safe-area-inset-top, 0px) + var(--full-edge)); right: calc(env(safe-area-inset-right, 0px) + var(--full-edge)); }
+#app.full.over > .top { height: 0; }
+#app.full #menuBtn { width: var(--full-btn); height: var(--full-btn); min-height: 0; padding: 0; margin: 0; }
+#app.full #menuBtn.cx-btn .cx { width: 2.25rem; height: 2.25rem; }
+/* over a picture that is always dark (a night sky, the Earth from space, a 3D scene) the button sits on a plate: a
+   see-through sheet disc with a brass hairline, so the mark's navy can't vanish in
+   any theme by day. A page opts in with `plate` on #app; these pages are named here so their own files stay theirs. */
+#app.full:is(.plate, .columbiad, .landfall, .almanac) #menuBtn { background: color-mix(in srgb, var(--sheet) 86%, transparent) !important;
+  box-shadow: 0 0 0 1px var(--brass), 0 2px 8px rgba(0, 0, 0, .35); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+#app.full:is(.plate, .columbiad, .landfall, .almanac) #menuBtn.cx-btn { border-radius: 50% !important; }
+#app.full:is(.plate, .columbiad, .landfall, .almanac) #menuBtn.cx-btn .k-menu { width: 1.5rem; height: 1.5rem; }
+#app.full:is(.plate, .columbiad, .landfall, .almanac) #menuBtn.cx-btn .cx { width: 2rem; height: 2rem; }
+html.watching-frame #app.full > .top { display: none; }                                    /* a partner's game in a frame: the picture alone */
+#app.full > .full-pull { margin-top: calc(-1 * var(--full-band)); min-height: var(--full-band); box-sizing: border-box;
+  padding: .6rem var(--full-slot) 0 0; }      /* .6rem: a line of text centred on the button (a row of its own, not a flex box: that drops the spaces between its words and figures) */
+/* Titled (Korbi, 3 November 2026: "a lot of the games look better with the title there ... the puzzles however, should
+   probably keep the title layout"): #app.full.titled is the same quiet band with the game's name in it, set in the suite's
+   name lettering, one line, kept clear of the button. The logo, the partner's pill and the Random tag stay out of
+   sight (the menu has them); the name is a label, not a button (Back to menu is in the menu). A status row (.full-pull)
+   is an ordinary line under the band, not laid over it. */
+#app.full.titled > .top { justify-content: flex-start; align-items: center; }
+#app.full.titled > .top > .mark { display: block !important; flex: 0 1 auto; min-width: 0; max-width: calc(100% - var(--full-slot)); margin: 0; padding-bottom: .25rem;
+  font-size: 1.05rem; font-weight: 800; letter-spacing: calc(.12em * var(--track)); line-height: 1.2; color: var(--ink); }   /* .25rem: its line centred on the button's */
+#app.full.titled > .top .mark-btn { display: block; max-width: 100%; pointer-events: none; cursor: default; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#app.full.titled > .top :is(.mark-icon, .partner-pill, .rd-tag) { display: none !important; }
+#app.full.titled > .full-pull { margin-top: 0; min-height: 0; padding: 0; }
+/* The title's logo (menu.js, titleLogo; Korbi, 4 November 2026): the game's own logo at the top left with its name beside it
+   on its right, the settings mark top right as ever; a tap on the logo is Back to menu. Not on a page without a title. */
+#app.full.titled > .top.has-logo { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: .5rem; }
+#app.full.titled > .top.has-logo > .mark { padding-bottom: 0; line-height: 1.1; }
+.home-logo { flex: none; position: relative; width: 1.75rem; height: 1.75rem; padding: 0; margin: 0; border: 0; background: none; cursor: pointer; display: block; --wire: 1;
+  -webkit-tap-highlight-color: transparent; border-radius: 4px; color: var(--ink); }
+.home-logo::before { content: ""; position: absolute; inset: -.45rem -.3rem -.45rem -.5rem; }       /* a finger-sized target round a small mark */
+.home-logo svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+.home-logo:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.home-logo:active { opacity: .7; }
+.menu-full-row { display: flex; gap: .5rem; }
+.menu-full-row .btn.wide { flex: 1 1 0; width: auto; margin-top: .45rem; }
+.menu-full .menu-line { margin-top: .5rem; }
+/* A game that fits the screen: the page is exactly the screen's height and never scrolls; its parts share the
+   height (the part marked .fit-grow takes what's left, in the page or in a .fit-col inside it), and anything long
+   scrolls inside its own box. */
+#app.fit-screen { height: 100vh; height: 100svh; box-sizing: border-box; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + .6rem);
+  display: flex; flex-direction: column; overflow: hidden; }
+.fit-col { display: flex; flex-direction: column; }
+#app.fit-screen > *, .fit-col > * { flex: none; }
+#app.fit-screen > .fit-grow, .fit-col > .fit-grow { flex: 1 1 auto; min-height: 0; }
+.fit-col[hidden], .fit-grow[hidden], .fit-box[hidden] { display: none; }
+/* part of a .fit-col that is a box of its own only where a game makes it one (held sideways, its halves side by side):
+   otherwise it isn't a box at all, and its children share the column's height as the column's own children do */
+.fit-half { display: contents; }
+.fit-half > * { flex: none; }
+.fit-half > .fit-grow { flex: 1 1 auto; min-height: 0; }
+/* a part that scrolls inside itself when its contents are longer than its room */
+.fit-scroll { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+/* a box whose contents size themselves to it (container units: 100cqw × 100cqh is the room they have) */
+.fit-box { container-type: size; display: grid; place-items: center; }
+/* maths from the banks (Temml → MathML) */
+.math { font-size: 1.05em; }
+.math.display { display: block; text-align: center; margin: .35rem 0; }
+math { font-family: "Temml", "Latin Modern Math", "STIX Two Math", "Cambria Math", serif; }
+.pool {
+  appearance: none; -webkit-appearance: none; min-height: 2.25rem; border: 0; border-radius: 4px; cursor: pointer;
+  padding: .3rem 1.9rem .3rem .75rem; background-color: var(--plate); color: var(--plate-ink);
+  font-weight: 700; font-stretch: 87.5%; max-width: 12.5rem; min-width: 0; text-overflow: ellipsis; white-space: nowrap;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 55%, calc(100% - 10px) 55%;
+  background-size: 5px 5px; background-repeat: no-repeat;
+}
+.pick {
+  background: none; border: 1.5px solid var(--brass); border-radius: 4px; color: var(--ink);
+  padding: .3rem .7rem; font-weight: 750; font-size: .8rem; font-stretch: var(--stretch-btn); letter-spacing: calc(.1em * var(--track)); text-transform: var(--caps);
+  cursor: pointer; min-height: 2.25rem; white-space: nowrap; flex-shrink: 0;
+}
+@media (max-width: 400px) {
+  .mark { font-size: 1.06rem; gap: .5rem; }
+  .pool { font-size: .9rem; padding-right: 1.7rem; }
+  .pick { padding: .3rem .55rem; }
+}
+
+.brief { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin: 1rem 0 1rem; }
+.coop .brief { flex-direction: column; align-items: stretch; gap: .6rem; }
+/* Under the grid, so a message appearing never moves the tiles. */
+.status { margin: .7rem 0 0; font-weight: 650; color: var(--ink); text-align: center; }
+.brief p { margin: 0; color: var(--ink-soft); max-width: 23rem; font-size: 1rem; }
+.mode-note { display: block; margin-top: .3rem; font-size: .85rem; font-weight: 700; color: var(--learn); }
+.players { display: flex; flex-direction: column; gap: .375rem; align-items: flex-end; flex: none; }
+.coop .players { align-items: flex-start; }
+.names { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .875rem; }
+.pl-name { font-weight: 700; font-stretch: 87.5%; font-size: .9rem; display: flex; align-items: center; gap: .3125rem; }
+.pl-name::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--p0); flex: none; }
+.pl-name.s1::before { background: var(--p1); }
+.pl-name.away { opacity: .55; }
+.pl-waiting { color: var(--ink-soft); font-size: .88rem; }
+/* Solo: hearts above clue marks. Together: one team row. */
+.team { display: flex; flex-direction: column; gap: .375rem; align-items: flex-end; }
+.coop .team { flex-direction: row; align-items: center; gap: .875rem; }
+.lives, .clue-dots { display: flex; gap: .3125rem; }
+.lives svg, .clue-dots i { width: .875rem; height: .875rem; flex: none; display: block; box-sizing: border-box; }
+.lives svg { fill: none; stroke: var(--ink-soft); stroke-width: 2.2; stroke-linejoin: round; }
+.lives svg.on { fill: var(--ink); stroke: var(--ink); }
+.clue-dots i {
+  border-radius: 50%; border: 1.5px solid var(--ink-soft); display: grid; place-items: center;
+  font-style: normal; font-size: .53125rem; font-weight: 800; line-height: 1; color: var(--ink-soft);
+}
+.clue-dots i.on { background: var(--ink); border-color: var(--ink); color: var(--yard); }
+
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+.cell { position: relative; aspect-ratio: 1 / var(--tile-ratio); }
+.tile {
+  position: absolute; inset: 0; width: 100%; border: 1.5px solid var(--tile-edge); border-radius: 5px; cursor: pointer;
+  background: var(--tile); color: var(--ink);
+  font-weight: 650; font-stretch: 87.5%; font-size: clamp(.8rem, 3.6vw, 1rem); line-height: 1.12;
+  padding: .35rem .3rem; overflow-wrap: normal; word-break: normal;
+  transition: background-color .12s ease, border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.tile[aria-pressed="true"] { border-color: var(--brass); box-shadow: inset 0 0 0 2px var(--brass); background: color-mix(in srgb, var(--brass) 14%, var(--tile)); }
+.tile:active { transform: scale(.97); }
+.grid.shake .tile[aria-pressed="true"] { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-.3125rem);} 75% { transform: translateX(.3125rem);} }
+
+/* Your partner's picks look exactly like yours (no player colours: those read as crate colours).
+   Where you both see the same tiles, a small initial says whose pick it is. */
+.cell.psel .tile { border-color: var(--brass); box-shadow: inset 0 0 0 2px var(--brass); background: color-mix(in srgb, var(--brass) 14%, var(--tile)); }
+.ptag {
+  position: absolute; left: .3125rem; bottom: .3125rem; width: 1.0625rem; height: 1.0625rem; border-radius: 50%;
+  display: grid; place-items: center; font-size: .65rem; font-weight: 800;
+  background: var(--ink); color: var(--yard); pointer-events: none;
+}
+/* marks: your note of a tile's crate, in its bottom-left corner; on a selected tile the swatch is a button that marks it
+   and moves the mark on through the crates' colours to none */
+.cell .mark { position: absolute; left: .375rem; bottom: .375rem; width: .6875rem; height: .6875rem; border-radius: 3px; pointer-events: none; box-shadow: 0 0 0 1.5px var(--yard); }
+.cell .mark.pick {
+  pointer-events: auto; left: .3125rem; bottom: .3125rem; width: .875rem; height: .875rem; min-width: 0; min-height: 0; padding: 0; margin: 0;
+  border-radius: 4px; cursor: pointer; z-index: 1; background: none; box-shadow: none; line-height: 0;
+  border: 1.5px dashed color-mix(in srgb, var(--ink) 60%, transparent); -webkit-tap-highlight-color: transparent;
+}
+.cell .mark.pick::before { content: ""; position: absolute; inset: -.5625rem; }     /* a finger-sized target around a small swatch */
+.cell .mark.pick[class*=" m"] { border: 1.5px solid var(--yard); box-shadow: 0 0 0 1.5px var(--ink); }
+.cell .mark.m0 { background: var(--c0); }
+.cell .mark.m1 { background: var(--c1); }
+.cell .mark.m2 { background: var(--c2); }
+.cell .mark.m3 { background: var(--c3); }
+.cell.psel .mark { left: 1.625rem; }                 /* your partner's initial has the corner: the mark sits beside it */
+.hint {
+  position: absolute; top: 0; right: 0; width: 1.875rem; height: 1.875rem; padding: 0; border: 0;
+  background: none; cursor: pointer; display: grid; place-items: center; z-index: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.hint span {
+  width: 1.125rem; height: 1.125rem; border-radius: 50%; display: grid; place-items: center;
+  font-size: .7rem; font-weight: 800; line-height: 1;
+  background: var(--ink); color: var(--yard);
+}
+.hint.spent span { opacity: .35; }
+/* An opened clue wears its crate's colour; "used" = you opened it and only your partner can read it. */
+/* (.cell raises these above the picked-tile colours, so the crate colour always shows) */
+.cell .hint.lv0 span { background: var(--c0); color: var(--on-c0); }
+.cell .hint.lv1 span { background: var(--c1); color: var(--on-c); }
+.cell .hint.lv2 span { background: var(--c2); color: var(--on-c); }
+.cell .hint.lv3 span { background: var(--c3); color: var(--on-c); }
+.cell .hint[class*="lv"] span { box-shadow: 0 0 0 1.5px var(--yard); }
+.hint.used span { background: none; color: var(--ink); border: 1.5px dashed currentColor; }
+/* Hidden mode: the sealed tile you've tapped, with a clue on offer. */
+.cell.peek .tile { outline: 2.5px solid var(--ink); outline-offset: -2.5px; }
+
+/* Hidden mode: your partner's tiles are sealed and unlabelled. */
+.tile.sealed {
+  background: repeating-linear-gradient(135deg, var(--tile) 0 8px, var(--tile-edge) 8px 9px);
+}
+
+.clue {
+  margin: .8rem 0 0; padding: .6rem .8rem; border-radius: 6px;
+  background: var(--sheet); border-left: 6px solid var(--ink); font-size: .98rem;
+}
+.clue.lv0 { border-left-color: var(--c0); }
+.clue.lv1 { border-left-color: var(--c1); }
+.clue.lv2 { border-left-color: var(--c2); }
+.clue.lv3 { border-left-color: var(--c3); }
+.clue b { font-weight: 750; }
+.clue small { display: block; margin-top: .3rem; color: var(--ink-soft); font-size: .85rem; }
+
+.solved { display: grid; gap: var(--gap); margin-bottom: var(--gap); container-type: inline-size; }
+/* Closed, a crate is exactly as tall as the row of tiles it replaces; tapped open, it grows. */
+.crate {
+  --row-h: calc((100cqw - 3 * var(--gap)) / 4 * var(--tile-ratio));
+  border: 2px solid; border-radius: 5px; width: 100%; text-align: left; cursor: pointer; color: var(--ink);
+  height: var(--row-h); padding: .25rem .75rem; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center; gap: .05rem;
+}
+.crate.open { height: auto; min-height: var(--row-h); justify-content: flex-start; padding-block: .55rem .7rem; }
+.crate-title { display: flex; align-items: baseline; gap: .5rem; min-width: 0; white-space: nowrap; }
+.crate.l0 { background: color-mix(in srgb, var(--c0) 26%, var(--sheet)); border-color: var(--c0); }
+.crate.l1 { background: color-mix(in srgb, var(--c1) 20%, var(--sheet)); border-color: var(--c1); }
+.crate.l2 { background: color-mix(in srgb, var(--c2) 20%, var(--sheet)); border-color: var(--c2); }
+.crate.l3 { background: color-mix(in srgb, var(--c3) 18%, var(--sheet)); border-color: var(--c3); }
+.crate.missed { border-style: dashed; opacity: .8; }
+.crate-name { font-size: 1.05rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); line-height: 1.15; flex: none; }
+.crate-meta { font-size: .82rem; font-weight: 600; color: var(--ink-soft); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* one line, always: the view shrinks the font until the four words fit */
+.crate-words { font-weight: 550; font-stretch: 87.5%; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crate-note { margin: .45rem 0 0; font-size: .93rem; display: none; }
+.crate-note p { margin: .15rem 0; }
+.crate-note .herring { margin-top: .4rem; font-style: italic; }
+.crate-note .tag {
+  font-style: normal; font-size: .75rem; font-weight: 700; white-space: nowrap;
+  border: 1px solid currentColor; border-radius: 999px; padding: 0 .4rem; opacity: .9;
+}
+.crate.open .crate-note { display: block; }
+.crate.land { animation: land .3s ease-out; }
+@keyframes land { from { transform: scaleY(.7); opacity: .4; } }
+
+.toast { min-height: 1.4em; text-align: center; font-weight: 700; margin: .7rem 0 .3rem; }
+
+.controls { display: flex; gap: .5rem; justify-content: center; }
+.btn {
+  border: 1.5px solid var(--brass); background: transparent; border-radius: 4px; color: var(--ink);
+  padding: .5rem 1.1rem; font-weight: 750; font-size: .86rem; font-stretch: var(--stretch-btn); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps);
+  cursor: pointer; min-height: 2.75rem;
+}
+.btn.primary { background: var(--plate); color: var(--plate-ink); border-color: var(--plate);
+  outline: 1px solid color-mix(in srgb, var(--plate-ink) 55%, transparent); outline-offset: -5px; }
+.btn:disabled { opacity: .35; cursor: default; }
+
+.result { margin-top: 1rem; text-align: center; }
+.sub-line { color: var(--ink-soft); margin: -.2rem 0 .7rem; }
+.feed { list-style: none; padding: 0; margin: 1.1rem 0 0; display: grid; gap: .25rem; }
+.guess { display: grid; grid-template-columns: auto auto 1fr; gap: .15rem .6rem; align-items: baseline;
+  padding: .45rem .6rem; border-radius: 6px; background: var(--sheet); font-size: .92rem; }
+.g-who { font-weight: 700; display: flex; align-items: center; gap: .3125rem; }
+.g-who::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--p0); }
+.g-who.s1::before { background: var(--p1); }
+.g-res { font-weight: 700; }
+.guess.r-right .g-res { color: color-mix(in srgb, var(--c1) 80%, var(--ink)); }
+.guess.r-one .g-res { color: color-mix(in srgb, var(--c0) 55%, var(--ink)); }
+.guess.r-miss .g-res { color: var(--c3); }
+.guess.r-hidden .g-res { color: var(--ink-soft); }
+.g-words { color: var(--ink-soft); grid-column: 1 / -1; }
+.btn.wide { width: 100%; margin: .8rem 0 .2rem; }
+.together { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin: .8rem 0 .4rem; }
+.together .btn { display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .6rem .5rem; border-radius: 10px; line-height: 1.2; }
+.together small { font-size: .78rem; font-weight: 500; opacity: .85; }
+.join-run { display: flex; gap: .5rem; margin: .7rem 0 .3rem; }
+.sheet .join-run input {
+  flex: 1; min-width: 0; font: inherit; font-size: 1rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: .45rem .7rem; margin: 0; border: 1.5px solid var(--brass); border-radius: 4px; background: var(--yard); color: var(--ink);
+}
+.sheet .join-run input::placeholder { text-transform: none; letter-spacing: normal; }
+#menuBody h3 { font-size: 1.05rem; margin: 1rem 0 0; }
+.room-link { font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; margin: .7rem 0 1rem; }
+.result-line { font-weight: 700; font-size: 1.1rem; margin: 0 0 .5rem; }
+.share-grid { font-family: inherit; font-size: 1.3rem; line-height: 1.15; margin: 0 0 1rem; }
+/* Crates held sideways (#app.beside): the crates and the tiles on the left, as wide as the height lets four rows of
+   tiles be (a tile is 4:5) and lettered in proportion; beside them the brief, what's happening, your guesses so far, and
+   the buttons at the bottom, where a thumb is */
+@media (orientation: landscape) and (min-width: 700px) {
+  #app.crates { grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto auto; }
+  .crates .cr-board { grid-column: 1; grid-row: 2 / -1; align-self: start; justify-self: center; margin-top: 1rem;
+    width: min(100%, (100vh - 7.5rem) * 1.25); width: min(100%, (100svh - 7.5rem) * 1.25); container-type: inline-size; }
+  .crates .tile { font-size: clamp(.7rem, 3.4cqw, 1.6rem); }
+  .crates .crate-name { font-size: clamp(1.05rem, 2.6cqw, 1.5rem); }
+  .crates .crate-meta { font-size: clamp(.82rem, 1.9cqw, 1.05rem); }
+  .crates .brief { grid-column: 2; grid-row: 2; margin-top: 1rem; }
+  .crates .status { grid-column: 2; grid-row: 3; }
+  .crates .clue { grid-column: 2; grid-row: 4; }
+  .crates .toast { grid-column: 2; grid-row: 5; }
+  .crates .feed { grid-column: 2; grid-row: 6; align-self: start; max-height: 100%; overflow-y: auto; overscroll-behavior: contain; margin: .4rem 0; }
+  .crates .controls { grid-column: 2; grid-row: 7; }
+  .crates .controls .btn { flex: 1 1 0; padding-inline: .4rem; }
+  .crates .result { grid-column: 2; grid-row: 8; margin-top: .5rem; }
+}
+
+dialog.sheet {
+  border: 0; border-radius: 12px 12px 0 0; padding: 1.2rem 1.1rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+  width: 100%; max-width: 34rem; margin: auto auto 0; background: var(--sheet); color: var(--ink);
+  border-top: 2px solid var(--brass);
+}
+dialog.sheet::backdrop { background: rgba(10, 18, 24, .45); }
+/* The sheet scrolls as one piece; its header (with Close) sticks to the top while you scroll.
+   svh = height with Safari's bars showing (plain vh assumes they're hidden). No flex sizing here:
+   Safari collapsed the flex-sized body to zero height. */
+#menuDlg { max-height: 88vh; max-height: 88svh; overflow-y: auto; overscroll-behavior: contain; padding-top: 0; }
+#menuDlg .pick-head {
+  position: -webkit-sticky; position: sticky; top: 0; z-index: 1;
+  background: var(--sheet); padding: 1.2rem 0 .5rem;
+}
+.set-head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: .4rem; }
+.set-head h3 { margin: 0; font-size: 1.25rem; font-weight: 800; }
+.set-note { margin: .45rem 0 .2rem; font-size: .9rem; }
+.set-note.sep { margin-top: 1.1rem; padding-top: .9rem; border-top: 1px solid color-mix(in srgb, var(--ink-soft) 35%, transparent); }
+.sheet h4 { margin: 1rem 0 .4rem; font-size: .72rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.12em * var(--track)); text-transform: var(--caps); color: var(--brass-lo); }
+.seg { display: inline-flex; border: 1.5px solid var(--brass); border-radius: 4px; overflow: hidden; }
+.seg button {
+  background: none; border: 0; border-left: 1.5px solid var(--brass); color: var(--ink);
+  font: inherit; font-size: .85rem; font-weight: 600; padding: .38rem .5rem; min-width: 2.9rem; cursor: pointer; white-space: nowrap;
+}
+.seg button:first-child { border-left: 0; }
+.seg button[aria-checked="true"] { background: var(--plate); color: var(--plate-ink); }
+.seg button:disabled { cursor: default; }
+.topic-row { display: flex; align-items: center; justify-content: space-between; gap: .6rem; padding: .22rem 0; }
+.topic-row span { font-size: .95rem; flex: 1; min-width: 0; line-height: 1.2; }
+.topic-row .seg { flex-shrink: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip {
+  font: inherit; font-size: .85rem; font-weight: 600; padding: .35rem .7rem; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--tile-edge); background: none; color: var(--ink-soft);
+}
+.chip[aria-pressed="true"] { border-color: var(--plate); background: var(--plate); color: var(--plate-ink); }
+.chip:disabled { cursor: default; }
+.sheet-words { font-weight: 700; margin: 0 0 .8rem; }
+.sheet label { display: block; color: var(--ink-soft); margin-bottom: .35rem; }
+.sheet input {
+  width: 100%; font-size: 1.25rem; padding: .55rem .7rem; margin-bottom: 1rem;
+  border: 1.5px solid var(--brass); border-radius: 4px; background: var(--yard);
+}
+.pick-head { display: flex; justify-content: space-between; align-items: center; }
+.pick-head h2 { font-size: 1.1rem; font-weight: 800; margin: 0; font-stretch: var(--wide); letter-spacing: calc(.1em * var(--track)); text-transform: var(--caps); }
+.pick-list { list-style: none; padding: 0; margin: 1rem 0; }
+.pick-list button {
+  width: 100%; display: flex; justify-content: space-between; background: none; border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-soft) 40%, transparent);
+  padding: .7rem .2rem; cursor: pointer; text-align: left;
+}
+.pick-list .cur { font-weight: 750; }
+.pick-list .st { color: var(--ink-soft); }
+.stats { color: var(--ink-soft); margin: 0 0 .6rem; }
+.link { background: none; border: 0; color: var(--ink-soft); text-decoration: underline; padding: 0; cursor: pointer; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* rooms.js: choosing which player to carry on as */
+.seat-list { display: grid; gap: .5rem; margin: .8rem 0 .4rem; }
+
+/* the games screen's head: the solo and duo codes, and each tile's best (yours, and your partner's in a duo room) */
+.apps .pick-head { gap: .5rem; }
+.apps .codes { display: flex; align-items: center; gap: .35rem; min-width: 0; flex: 1; flex-wrap: nowrap; }
+.code-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .55rem .3rem .45rem; flex: none; -webkit-touch-callout: none; user-select: none; border: 1.5px solid var(--tile-edge); border-radius: 4px;
+  background: var(--sheet); color: var(--ink); font: inherit; font-size: .82rem; cursor: pointer; max-width: 100%; }
+.code-chip span { color: var(--ink-soft); font-weight: 700; }
+.code-chip b { font-weight: 800; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.code-chip em { font-style: normal; color: var(--ink-soft); font-size: .76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.code-chip em.on { color: var(--learn); font-weight: 700; }
+.app-best { display: block; font-size: .66rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.app-best:empty { display: none; }
+
+/* the partner sheet, over the games screen */
+.pair-sheet { position: relative; width: min(92vw, 26.25rem); border: 1.5px solid var(--tile-edge); border-radius: 16px; padding: 1rem; background: var(--sheet); color: var(--ink); }
+.pair-sheet h3 { padding-right: 2.6rem; }
+.pair-sheet .sheet-x { position: absolute; top: .6rem; right: .6rem; width: 2.125rem; height: 2.125rem; }
+.pair-sheet .btn.wide { display: block; width: 100%; }
+.pair-sheet .link { display: block; margin: .7rem auto 0; }
+.pair-sheet::backdrop { background: rgba(0, 0, 0, .35); }
+.pair-sheet h3 { margin: 0 0 .5rem; }
+/* sure.js: a question, a line to type or a notice, over whatever page is open */
+dialog.sure { width: min(92vw, 22rem); box-sizing: border-box; margin: auto; padding: 0; border: 1.5px solid var(--brass); border-radius: 6px;
+  background: var(--sheet); color: var(--ink); box-shadow: 0 18px 50px rgba(0, 0, 0, .25); }
+dialog.sure::backdrop { background: rgba(10, 14, 18, .45); }
+dialog.sure form { margin: 0; padding: 1.1rem; }
+dialog.sure p { margin: 0 0 1rem; line-height: 1.45; font-size: .95rem; }
+dialog.sure input { display: block; width: 100%; box-sizing: border-box; margin: 0 0 1rem; padding: .55rem .65rem; font: inherit; font-size: 1rem;
+  color: var(--ink); background: var(--tile); border: 1.5px solid var(--tile-edge); border-radius: 4px; }
+dialog.sure input:focus { outline: 2px solid var(--brass); outline-offset: 1px; }
+dialog.sure .sure-row { display: flex; gap: .6rem; justify-content: flex-end; }
+dialog.sure .sure-row .btn { flex: 1; padding-inline: .8rem; }
+.pair-sheet .btn.wide { margin-top: .45rem; }
+/* your partner asks to play together: a banner over whatever you're playing */
+.pair-ask { position: fixed; left: .5rem; right: .5rem; top: calc(env(safe-area-inset-top, 0px) + .5rem); z-index: 1000; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
+  padding: .6rem .75rem; border-radius: 14px; background: var(--sheet); color: var(--ink); border: 1.5px solid var(--tile-edge); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); font-size: .92rem; }
+.pair-ask span { flex: 1 1 12rem; }
+.pair-ask .btn { min-height: 2.375rem; }
+
+/* your partner, in every game's title: one small line that never changes the header's height */
+.partner-pill { display: inline-block; margin-left: .45rem; max-width: 30vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;
+  font-size: .62rem; font-weight: 700; line-height: 1.5; padding: 0 .4rem; border-radius: 999px; background: var(--yard, #e3e6ea); color: var(--ink-soft); }
+.partner-pill:empty { display: none; }
+.partner-pill.on { color: #3a9d57; }
+
+/* watching your partner: their game under a veil that keeps your taps off it, and a bar to stop */
+.watch-shell { position: fixed; inset: 0; z-index: 900; background: var(--yard); }
+.watch-frames, .watch-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.watch-frame { pointer-events: none; background: var(--yard); }        /* the frames take no taps: watching only */
+.watch-frame.next { visibility: hidden; }                              /* loading behind the one on show */
+.watch-bar { position: fixed; z-index: 1; left: .5rem; right: .5rem; bottom: calc(env(safe-area-inset-bottom, 0px) + .5rem); display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .75rem; border-radius: 14px; background: var(--sheet); color: var(--ink); border: 1.5px solid var(--tile-edge); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); font-size: .9rem; }
+.watch-bar span { flex: 1; }
+.watch-bar .btn { min-height: 2.25rem; }
+.watch-bar { flex-wrap: wrap; }
+/* Request to join, while you watch a game two can share (coop-ui.js): a row of its own under the name and Stop, and under it
+   what the request is doing */
+.watch-bar [data-join] { order: 8; flex: 1 1 100%; }
+@media (min-width: 700px) { .watch-bar.joinable { left: 50%; right: auto; width: 26rem; max-width: calc(100% - 1rem); transform: translateX(-50%); } }   /* a tablet: a card, not the width of the screen */
+.coop-say { order: 9; flex: 1 1 100%; margin: 0; font-size: .8rem; line-height: 1.3; color: var(--ink-soft); }
+.coop-say[hidden] { display: none; }
+.watch-bar.asking .coop-say { color: var(--ink); }
+/* a request to join your board: the words, then both answers side by side */
+.pair-ask.join span { flex: 1 1 100%; }
+.pair-ask.join .btn { flex: 1 1 0; }
+/* two requests at once (play together, join my board): the second under the first */
+.pair-ask ~ .pair-ask { top: calc(env(safe-area-inset-top, 0px) + 5.6rem); }
+
+/* playing one board with your partner (coop-page.js): who you are with, whether they are here, and the way out */
+.coop-bar { display: flex; align-items: center; gap: .45rem; min-width: 0; font-size: .82rem; color: var(--ink-soft); }
+.coop-bar[hidden] { display: none; }
+.coop-dot { flex: none; width: .6rem; height: .6rem; border-radius: 50%; background: var(--learn); }
+.coop-bar.away .coop-dot { background: none; box-shadow: inset 0 0 0 1.5px var(--ink-soft); }
+.coop-who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.coop-who b { color: var(--ink); font-weight: 800; }
+.coop-leave { flex: none; min-height: 2.125rem; padding: 0 .75rem; border: 1.5px solid var(--tile-edge); border-radius: 4px; background: var(--yard); color: var(--ink);
+  font: inherit; font-size: .72rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); cursor: pointer; touch-action: manipulation; }
+html[data-theme="office"] .coop-leave { border-radius: 12px; font-stretch: 100%; text-transform: none; letter-spacing: normal; }
+
+.code-chip svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; flex: none; }
+.partner-line { min-width: 0; flex: 1 1 auto; border: 0; background: none; padding: .3rem .1rem; font: inherit; font-size: .78rem; font-weight: 700;
+  color: var(--ink-soft); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.partner-line.on { color: var(--learn); }
+/* the head's icon buttons: settings, update (it turns while it fetches) and close */
+.icon-btn { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; flex: none; border: 1.5px solid var(--brass); border-radius: 50%;
+  background: var(--sheet); color: var(--ink); cursor: pointer; padding: 0; }
+.icon-btn svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn:disabled { opacity: .6; }
+/* the mark in a ring of its own (the games screen's Settings, in Codex): drawn in its own colours, not the line icons' */
+.icon-btn svg.cx { width: 1.75rem; height: 1.75rem; stroke: none; }
+.icon-btn.spin svg { animation: icon-spin 1s linear infinite; }
+@keyframes icon-spin { to { transform: rotate(360deg); } }
+
+/* every game's menu: one popup. A sheet rising from the bottom on a phone, a card in the middle on a wide screen;
+   the × at the top right (the game's own Close button, reshaped by menu.js); a tap outside closes it */
+dialog.menu-sheet { border-radius: 10px 10px 0 0; padding: 0 1.1rem calc(1rem + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 30px rgba(0, 0, 0, .18); }
+dialog.menu-sheet[open] { animation: menu-up .22s cubic-bezier(.2, .8, .2, 1); }
+@keyframes menu-up { from { transform: translateY(1.5rem); opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { dialog.menu-sheet[open] { animation: none; } }
+@media (min-width: 640px) { dialog.menu-sheet { margin: auto; border-radius: 10px; border: 1.5px solid var(--brass); max-width: 30rem; box-shadow: 0 16px 48px rgba(0, 0, 0, .25); } }
+dialog.menu-sheet .pick-head { align-items: center; padding: .9rem 0 .5rem; }
+dialog.menu-sheet .pick-head h2 { font-size: 1rem; }
+dialog.menu-sheet .menu-x { width: 2.25rem; height: 2.25rem; }
+/* the standard parts, each under the same small heading */
+.menu-part { margin-top: .9rem; padding-top: .7rem; border-top: 1px solid color-mix(in srgb, var(--ink-soft) 25%, transparent); }
+.menu-part:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.menu-h { margin: 0 0 .45rem; font-size: .7rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.14em * var(--track)); text-transform: var(--caps); color: var(--brass-lo); }
+/* the long explanations, folded away at the bottom */
+details.menu-how { margin-top: 1rem; padding-top: .7rem; border-top: 1px solid color-mix(in srgb, var(--ink-soft) 25%, transparent); color: var(--ink-soft); font-size: .88rem; }
+details.menu-how summary { cursor: pointer; font-weight: 700; color: var(--ink); list-style-position: inside; padding: .2rem 0; }
+details.menu-how p { margin: .5rem 0 0; line-height: 1.45; }
+
+/* Loading (loading.js). While a page loads, and while a long task runs, the mark turns large in the middle of the
+   screen, the task's words under it: a page that's ready at once never shows it (it fades in after a moment), and it
+   lets taps through while a page loads, so a page that somehow never says it's ready isn't locked behind it. The mark
+   itself is the .cx-load layers below (theme.js puts them in), over this overlay's page-coloured ground. */
+html:not(.ready) body::after, html.busy body::after {
+  content: attr(data-busy); position: fixed; inset: 0; z-index: 2147483000; display: block; box-sizing: border-box;
+  padding: calc(50vh + min(23vw, 6.5rem) + .4rem) 1.5rem 0; text-align: center;
+  background: var(--yard);
+  color: var(--brass-lo); font: 800 .76rem/1.4 var(--font); font-stretch: var(--wide); letter-spacing: calc(.16em * var(--track)); text-transform: var(--caps);
+  animation: busy-in .2s .35s both;
+}
+html:not(.ready) body::after { pointer-events: none; }
+html.busy body::after { animation-delay: 0s; }
+@keyframes busy-in { from { opacity: 0; } }
+/* A task with stages (loading.js, progress): under the mark's words, a bar filling as it goes, a glint running along
+   it so a long stage never looks stuck, and the stage's words under the bar; the bar in the brass that reads as text
+   . A page opened to join others (a party, a table, a partner's match) shows its
+   words and a bar from its first moment, while its own files load (theme.js sets html.joining and the words, before
+   anything of the page has run); the page's own take over once it runs. */
+/* The mark, large: nine pictures stacked (mark/*.svg, put in by theme.js), each moving part its own layer, so the GPU
+   turns them as textures and nothing is repainted: a page still loading, its main thread busy, can't make it stutter
+   (an animated SVG on the page's own thread dropped to 26 frames a second under that load; this holds 60). Speeds are
+   the movement's own: the great wheel (.a) clockwise in 3 s, the ring (.r) anticlockwise in 6 s, the pinions (.b, .d)
+   anticlockwise in 1.5 s about their own axes (tools/build-mark.mjs); everything is back where it began every 6 s. */
+.cx-load { display: none; position: fixed; z-index: 2147483001; left: 50%; top: calc(50% - .9rem); width: min(46vw, 13rem); aspect-ratio: 1; translate: -50% -50%; pointer-events: none; }
+html:not(.ready) .cx-load.on, html.busy .cx-load.on { display: block; animation: busy-in .2s .35s both; }
+html.busy .cx-load.on { animation-delay: 0s; }
+.cx-load img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cx-load .m { will-change: transform; animation: cx-turn linear infinite; }
+.cx-load .a { animation-duration: 3s; }
+.cx-load .r { animation-duration: 6s; animation-direction: reverse; }
+.cx-load .b, .cx-load .d { animation-duration: 1.5s; animation-direction: reverse; }
+.cx-load .b { transform-origin: 38.96% 56.38%; }
+.cx-load .d { transform-origin: 61.04% 56.38%; }
+/* Reduce Motion stops every animation (the global rule above), and a phone with it on showed a mark that never turned, or
+   none at all while a page loaded. The turning is the progress indicator, not decoration, so the mark keeps it, and its fade-in
+   (which is what keeps it from flashing on a page that is ready at once). The rest of the stage's motion still goes. */
+@media (prefers-reduced-motion: reduce) {
+  .cx-load .m { animation: cx-turn linear infinite !important; }
+  .cx-load .a { animation-duration: 3s !important; }
+  .cx-load .r { animation-duration: 6s !important; animation-direction: reverse !important; }
+  .cx-load .b, .cx-load .d { animation-duration: 1.5s !important; animation-direction: reverse !important; }
+  html:not(.ready) .cx-load.on, html.busy .cx-load.on, html:not(.ready) body::after, html.busy body::after { animation: busy-in .2s .35s both !important; }
+  html.busy .cx-load.on, html.busy body::after { animation-delay: 0s !important; }
+}
+html.joining:not(.ready) body::after { content: var(--busy-say, ""); }
+html.busy body[data-busy-step]::before, html.joining:not(.ready) body::before {
+  content: attr(data-busy-step); position: fixed; z-index: 2147483001; left: 50%; top: calc(50vh + min(23vw, 6.5rem) + 2.6rem);
+  transform: translateX(-50%); width: min(72vw, 17rem); box-sizing: border-box; padding-top: 1rem;
+  color: var(--ink-soft); font: 650 .84rem/1.35 var(--font); text-align: center; letter-spacing: normal; text-transform: none;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--yard) 75%, transparent), transparent) -67% 0 / 40% .3rem no-repeat,
+    linear-gradient(var(--brass-lo), var(--brass-lo)) 0 0 / var(--busy-at, 0%) .3rem no-repeat,
+    linear-gradient(color-mix(in srgb, var(--brass-lo) 20%, transparent), color-mix(in srgb, var(--brass-lo) 20%, transparent)) 0 0 / 100% .3rem no-repeat;
+  transition: background-size .5s ease-out;
+  animation: busy-glint 1.8s linear infinite;
+}
+html.joining:not(.ready) body::before { content: var(--busy-step, ""); pointer-events: none; animation: busy-in .2s .35s both, busy-glint 1.8s .35s linear infinite; }
+@keyframes busy-glint { from { background-position: -67% 0, 0 0, 0 0; } to { background-position: 167% 0, 0 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  html:not(.ready) body::before { display: none; }
+  html.busy body::before { animation: none; transition: none; }
+}
+/* a picture on its way (pics.js): the small mark turns where it will appear, until the painting covers it */
+img.pic { background: url("loader-small.svg") center / 2.2rem no-repeat; }
+/* the small mark, before the words of a short wait */
+.ld { display: inline-block; width: 1.3em; height: 1.3em; margin-right: .4em; vertical-align: -.32em; background: url("loader-small.svg") center / contain no-repeat; }
+
+/* Codex's home: the screen of games is the page, so there's nothing to close it back to */
+.home dialog.apps [data-close] { display: none; }
+
+/* the menu's controls: a row with its label; one-of as a segmented row, on-off as a switch; a quiet status line */
+/* a label and a segmented choice side by side; where they don't fit (a narrow phone), the choice
+   moves under its label whole, never breaking apart */
+.menu-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem .75rem; margin: .5rem 0; }
+.menu-label { font-weight: 700; font-size: .95rem; }
+.menu-seg { display: inline-flex; flex-wrap: nowrap; flex: none; max-width: 100%; margin-left: auto; gap: 0; border: 1.5px solid var(--tile-edge); border-radius: 10px; overflow: hidden; }
+.menu-seg button { border: 0; background: none; color: var(--ink); font: inherit; font-size: .88rem; font-weight: 700; padding: .42rem .7rem; cursor: pointer; white-space: nowrap; }
+.menu-seg button + button { border-left: 1.5px solid var(--tile-edge); }
+@media (max-width: 380px) {   /* a narrow phone: the segments tighten with the screen, so three still fit on one line */
+  .menu-seg button { font-size: clamp(.72rem, 3.5vw, .88rem); padding-inline: clamp(.3rem, 1.9vw, .7rem); }
+}
+.menu-seg button[aria-checked="true"] { background: var(--ink); color: var(--sheet); }
+.menu-switch { position: relative; width: 2.875rem; height: 1.75rem; flex: none; border-radius: 999px; border: 1.5px solid var(--tile-edge); background: var(--yard); cursor: pointer; padding: 0; }
+.menu-switch::after { content: ""; position: absolute; top: .1875rem; left: .1875rem; width: 1.1875rem; height: 1.1875rem; border-radius: 50%; background: var(--ink-soft); transition: transform .15s; }
+.menu-switch[aria-checked="true"] { background: var(--ink); }
+.menu-switch[aria-checked="true"]::after { transform: translateX(1.125rem); background: var(--sheet); }
+.menu-line { margin: .35rem 0; color: var(--ink-soft); font-size: .9rem; }
+.menu-part .btn.wide { margin-top: .45rem; }
+.menu-link { display: block; margin: .6rem auto 0; }
+
+/* a long one-of (Punt's levels) as a grid of the same buttons */
+.menu-grid-wrap { margin: .5rem 0; }
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.4rem, 1fr)); gap: .35rem; margin-top: .4rem; }
+.menu-grid button { border: 1.5px solid var(--tile-edge); border-radius: 10px; background: none; color: var(--ink); font: inherit; font-size: .86rem; font-weight: 700; padding: .45rem .5rem; cursor: pointer; }
+.menu-grid button:is([aria-checked="true"], [aria-pressed="true"]) { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
+
+/* the games screen's head: a person (solo) and two people (partner), each with a tick once set; your partner's status
+   takes the rest of the line */
+.code-chip .code-tick { width: .95rem; height: .95rem; color: #3a9d57; stroke-width: 2.6; }
+.code-chip { padding: .3rem .5rem .3rem .45rem; }
+/* in a game's header: the dropdowns live in the menu now (under Content), and the menu button is the mark */
+.top .dd, .top select.pool, .ch-pick { display: none !important; }   /* Chart's topic and region too */
+/* the menu button: the mark, large and unboxed (no frame or fill round it, as an instrument sits on the page). It stands
+   still, and while the menu is open its movement turns at the true speeds (see .cx-load): the great wheel (.cx-a), the
+   ring (.cx-r), the pinions (.cx-b, .cx-d; mark.js gives them their own centres) */
+.cx-btn { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0 !important; border: 0 !important; background: none !important; border-radius: 50%; }
+.cx-btn .cx { width: 2.5rem; height: 2.5rem; display: block; }
+.cx g { transform-box: view-box; }
+.cx-a, .cx-r { transform-origin: 50px 50px; }
+.turning .cx .cx-a { animation: cx-turn 3s linear infinite; }
+.turning .cx .cx-r { animation: cx-turn 6s linear infinite reverse; }
+.turning .cx .cx-b, .turning .cx .cx-d { animation: cx-turn 1.5s linear infinite reverse; }
+@keyframes cx-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {   /* the mark's turning is kept under Reduce Motion, as the loader's is (above) */
+  .turning .cx .cx-a { animation: cx-turn 3s linear infinite !important; }
+  .turning .cx .cx-r { animation: cx-turn 6s linear infinite reverse !important; }
+  .turning .cx .cx-b, .turning .cx .cx-d { animation: cx-turn 1.5s linear infinite reverse !important; }
+}
+
+/* the partner pill in a game's title: plain lettering (not the title's capitals), and the room the header now has */
+.partner-pill { text-transform: none; letter-spacing: 0; font-family: inherit; max-width: 42vw; font-size: .68rem; flex: 0 1 auto; min-width: 0; }
+
+.app-name.long { letter-spacing: calc(.05em * var(--track)); }   /* long names (Refinery, Manifest) fit their tiles */
+.app-name.longer { font-size: clamp(.6rem, 11.5cqh, .76rem); }   /* and Undercover */
+/* the games screen's Settings */
+.settings-body { padding: .2rem 0 .6rem; }
+/* Settings' "Start a game over": the games three across, and quiet while one is being cleared */
+.settings-reset .menu-grid { grid-template-columns: repeat(auto-fit, minmax(5.2rem, 1fr)); }
+.settings-reset .menu-grid button:disabled { opacity: .45; cursor: default; }
+
+/* the header: a game's name never gives way. The title holds at least its icon and its word, and your partner's pill
+   takes only what's left (shortened, or gone on a narrow phone), instead of pushing the name under the buttons */
+.top .mark { flex: 1 1 auto; min-width: auto; }
+.top .mark-btn { flex: 1 1 auto; max-width: 100%; }
+.top .partner-pill { flex: 1 1 0; width: 0; min-width: 0; }
+
+.menu-stages { margin: .4rem 0; }
+.menu-stages summary { cursor: pointer; font-weight: 700; font-size: .92rem; padding: .3rem 0; }
+.menu-stages summary span { font-weight: 500; color: var(--ink-soft); }
+
+/* numbers (difficulty 1–10) in one dense row */
+.menu-grid.dense { grid-template-columns: repeat(auto-fit, minmax(2.2rem, 1fr)); gap: .25rem; }
+.menu-grid.dense button { padding: .45rem 0; }
+
+/* where flags come from the flag font, the elements that name their own font take it too */
+html.flag-font :is(button, input, select, textarea) { font-family: var(--font); }
+
+/* The banner (random.js, deck-row.js, banner.js; README, Random mode and Deck, "Scope"). On the games screen, under its
+   head, one line of three equal buttons: Deck (a review of what's due), Random (Next game and Stop while it plays this
+   game) and Choose, which sets what both cover; a way to play, not a tile. Each of the three is drawn by its own module
+   into its own cell, which takes no box of its own. The icons are line icons in every theme, in the colour of the
+   button they're on. */
+.rd-rows { margin: .75rem 0 0; flex: none; max-width: 30rem; }
+.rd-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.rd-row:has(.rd-stop) { grid-template-columns: repeat(2, minmax(0, 1fr)) auto minmax(0, 1fr); }   /* Stop, between Random and Choose, only while random mode plays */
+.rd-cell { display: contents; }
+.rd-row .btn { display: inline-flex; align-items: center; justify-content: center; gap: .3rem; min-height: 2.5rem; margin: 0; padding: .4rem .3rem;
+  font-size: .78rem; letter-spacing: calc(.03em * var(--track)); white-space: nowrap; }
+/* a plate's words give way before the row does, on a screen narrower than a phone's 390 */
+.rd-row .rd-play { min-width: 0; }
+.rd-row .rd-play > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.rd-words { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.rd-words small { font-size: .68rem; font-weight: 600; opacity: .85; }
+.rd-ico { width: 1.125rem; height: 1.125rem; flex: none; }
+html :is(.rd-tag, .rd-row, .rd-next) svg.k-ico { color: inherit; }
+/* Choose's sheet: Random's games by section and Deck's games and topics, each with All and None (menu.js's ticks);
+   topics have longer names than games, so wider cells; the sheet scrolls, the screen doesn't */
+.rd-sheet .rd-sheet-body, .rd-scope .rd-sheet-body { padding: .2rem 0 .4rem; }
+.rd-sheet .rd-sheet-body > .menu-row { margin-bottom: .8rem; }
+.rd-pane-random .menu-grid { grid-template-columns: repeat(auto-fill, minmax(6.4rem, 1fr)); }
+.rd-pane-deck .menu-grid, .rd-scope .menu-grid { grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); }
+.rd-pane-deck > * + *, .rd-scope .rd-sheet-body > * + * { margin-top: .8rem; }
+.menu-ticks-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
+.menu-allnone { font-size: .8rem; color: var(--ink-soft); white-space: nowrap; }
+.menu-allnone .link { font-size: .8rem; }
+/* in a game's title while random mode plays it: a tag beside the name, in the room the header has left (as the partner
+   pill takes it); random.js shows it whole there, its mark alone (.rd-short) or nothing (.rd-none) */
+.rd-tag { flex: 1 1 0; width: 0; min-width: 0; display: flex; align-items: center; overflow: hidden; }
+.rd-chip { display: inline-flex; align-items: center; gap: .2rem; flex: none; padding: .125rem .3125rem; border: 1px solid var(--brass); border-radius: 3px;
+  font-size: .56rem; font-weight: 800; line-height: 1.2; font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps);
+  color: var(--brass-lo); white-space: nowrap; }
+.rd-chip .rd-ico { width: .75rem; height: .75rem; }
+.rd-tag.rd-short .rd-word { display: none; }
+.rd-tag.rd-none .rd-chip { visibility: hidden; }
+/* at the head of the game's menu: Next game and Stop side by side */
+.rd-acts { display: flex; gap: .5rem; margin-top: .45rem; }
+.rd-acts .btn { flex: 1 1 0; margin: 0; }
+/* a round over: the next game named over the page, three seconds counting down in the figure and the fuse under it */
+.rd-next { position: fixed; left: .5rem; right: .5rem; top: calc(env(safe-area-inset-top, 0px) + .5rem); z-index: 1001; display: flex; align-items: center; gap: .7rem;
+  max-width: 34rem; margin: 0 auto; padding: .55rem .6rem .7rem .75rem; overflow: hidden; box-sizing: border-box;
+  background: var(--sheet); color: var(--ink); border: 1.5px solid var(--brass); border-radius: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
+.rd-next-logo { width: 2.25rem; height: 2.25rem; flex: none; display: grid; place-items: center; --wire: 1; }
+.rd-next-logo svg { width: 100%; height: 100%; display: block; }
+.rd-next-words { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: .1rem; line-height: 1.15; }
+.rd-next-words small { font-size: .62rem; font-weight: 800; color: var(--brass-lo); font-stretch: var(--wide); letter-spacing: calc(.16em * var(--track)); text-transform: var(--caps); }
+.rd-next-words b { font-size: 1.05rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.1em * var(--track)); text-transform: var(--caps);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-next-count { flex: none; min-width: 1.25rem; text-align: center; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--brass-lo); }
+.rd-next .btn { flex: none; min-height: 2.375rem; padding: .35rem .9rem; }
+.rd-next-fuse { position: absolute; left: 0; right: 0; bottom: 0; height: .1875rem; background: var(--brass-lo); transform-origin: left; }
+
+/* Marked for removal (topics.js showStar): what is specialist or personal, kept in the knowledge base until release, carries a
+   brass star on the rim of its card (the top edge, right of centre) when Settings includes it. Out of the flow, so it moves nothing; a card
+   whose edge is busy sets --star-top, --star-right and --star-bg itself. */
+.has-star { position: relative; }
+.marked-star { position: absolute; top: var(--star-top, -.5rem); right: var(--star-right, 1rem); z-index: 2; padding: 0 .1875rem; font-size: .875rem; line-height: 1; color: var(--brass); background: var(--star-bg, var(--sheet)); pointer-events: none; }

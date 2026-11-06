@@ -1,0 +1,35 @@
+/* Mahjong's course (hong-course.js, on course.css's sheet): the tiles of a lesson, in rows, with the hand to pick from and
+   the buttons of an exercise. The tiles are the table's own symbols (hong-tiles.js); their size, --hc-t, is set by the
+   stage to the largest at which the lesson fits. */
+.ln-sheet.hk { --ln-in: var(--hk-in); }
+.hc { --hc-t: 2.4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: .55rem; justify-items: center; align-content: center; min-width: 0; padding: .3rem 0; }
+.hc-row { display: grid; justify-items: center; gap: .25rem; max-width: 100%; }
+.hc-row > small { font-size: .74rem; font-weight: 800; color: var(--ink-soft); font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); text-align: center; }
+.hc-row > small i { font-style: normal; text-transform: none; letter-spacing: 0; font-stretch: normal; font-weight: 600; color: var(--ln-in); }
+.hc-word { font-size: 1.05rem; font-weight: 800; color: var(--ln-in); text-align: center; }
+.hc-table { display: grid; width: min(100%, 26rem); }
+.hc-trow { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .32rem .1rem; border-bottom: 1px solid var(--rule); font-size: .9rem; }
+.hc-trow span { font-weight: 600; }
+.hc-trow b { color: var(--ln-in); text-align: right; font-weight: 800; }
+.hc-chips { display: flex; gap: .4rem; }
+.hc-chips span { padding: .1rem .5rem; border: 1px solid var(--rule); border-radius: 4px; color: var(--ink-soft); font-size: .72rem; font-weight: 700; }
+.hc-line { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: calc(var(--hc-t) * .12); max-width: min(100%, calc(var(--per, 99) * var(--hc-t) * 1.12 + 2px)); }
+.hc-hand { gap: calc(var(--hc-t) * .12); }
+.hc-melds { display: flex; gap: calc(var(--hc-t) * .12); margin-right: calc(var(--hc-t) * .3); }
+.hc-meld { display: flex; }
+.hc-meld .hc-tile { width: calc(var(--hc-t) * .8); }
+.hc-tile { flex: none; display: block; width: var(--hc-t); padding: 0; border: 0; background: none; font: inherit; position: relative;
+  -webkit-user-select: none; user-select: none; filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--ink) 18%, transparent)); transition: transform .12s; }
+button.hc-tile { cursor: pointer; }
+.hc-tile.gap { margin-left: calc(var(--hc-t) * .35); }
+.hc-tile.sel { transform: translateY(-.45rem); }
+.hc-tile.sel::after, .hc-tile.hint::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: -.4rem; height: .2rem; border-radius: 2px; background: var(--ln-in); }
+.hc-tile.hint::after { background: repeating-linear-gradient(90deg, var(--ln-in) 0 .3rem, transparent .3rem .5rem); }
+.hc-air { padding: .45rem .8rem; border-radius: 6px; background: color-mix(in srgb, var(--ln-in) 9%, var(--sheet)); border: 1px solid var(--tile-edge); }
+.hc-air .hc-tile { width: calc(var(--hc-t) * 1.15); }
+.hc-opts { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; width: 100%; }
+.hc-opt { flex: 1 1 5rem; max-width: 9rem; min-height: 2.75rem; padding: .45rem .7rem; border: 1.5px solid var(--tile-edge); border-radius: 6px; background: var(--tile);
+  color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+.hc-opt.tried { border-color: var(--ln-no); }
+.hc-opt.hint { border-color: var(--ln-in); box-shadow: inset 0 0 0 1.5px var(--ln-in); }
+@media (prefers-reduced-motion: reduce) { .hc-tile { transition: none; } }

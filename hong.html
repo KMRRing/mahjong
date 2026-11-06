@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E8DFC9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10181F" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Codex">
+<title>Mahjong</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script src="theme.js"></script>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="course.css">
+<link rel="stylesheet" href="hong.css">
+<link rel="stylesheet" href="hong-3d.css">
+<link rel="stylesheet" href="hong-course.css">
+<link rel="stylesheet" href="themes.css">
+</head>
+<body>
+<div id="app" class="hong full fit-screen beside">
+  <header class="top">
+    <h1 class="mark"><button id="appsBtn" class="mark-btn" aria-haspopup="dialog">
+      <span class="mark-icon hk-mark" aria-hidden="true"></span>Mahjong</button></h1>
+    <div class="top-right">
+      <button id="helpBtn" class="pick" aria-haspopup="dialog">Rules</button>
+      <button id="menuBtn" class="pick" aria-haspopup="dialog">Menu</button>
+    </div>
+  </header>
+
+  <section id="table" class="hk-table fit-grow fit-box" aria-label="The table">
+    <svg id="board" class="hk-board" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The table: the others' sets and discards"></svg>
+    <div id="board3d" class="hk3-board" aria-label="The table, seen at an angle" hidden></div>
+  </section>
+
+  <div id="mine" class="hk-mine" aria-live="polite"></div>
+  <div id="hand" class="hk-hand" aria-label="Your tiles"></div>
+  <section class="hk-bar" aria-label="Your move">
+    <p id="coach" class="hk-coach" hidden></p>
+    <div id="actions" class="hk-actions" aria-live="polite"></div>
+  </section>
+</div>
+
+<dialog id="menuDlg" class="sheet" aria-label="Menu">
+  <div class="pick-head"><h2>Menu</h2><button class="btn" type="button" id="menuClose">Close</button></div>
+  <div id="menuBody"></div>
+</dialog>
+
+<dialog id="rulesDlg" class="sheet hk-sheet" aria-label="Rules">
+  <div class="pick-head"><h2>Rules</h2><button class="btn" type="button" id="rulesClose">Close</button></div>
+  <div id="rulesBody" class="hk-rules"></div>
+</dialog>
+
+<dialog id="resultDlg" class="sheet hk-sheet" aria-labelledby="resultHead">
+  <h2 id="resultHead" class="hk-result-head"></h2>
+  <div id="resultBody" class="hk-result"></div>
+  <div class="hk-result-go"><button class="hk-go quiet" type="button" id="tableBtn">The table</button><button class="hk-go primary" type="button" id="nextBtn">Next hand</button></div>
+</dialog>
+
+<dialog id="whyDlg" class="sheet hk-sheet" aria-label="The coach's reasons">
+  <div class="pick-head"><h2>Why</h2><button class="btn" type="button" id="whyClose">Close</button></div>
+  <div id="whyBody" class="hk-why"></div>
+</dialog>
+
+<dialog id="rushDlg" class="sheet hk-sheet" aria-labelledby="rushHead">
+  <h2 id="rushHead" class="hk-result-head"></h2>
+  <div id="rushBody" class="hk-result"></div>
+  <div class="hk-result-go"><button class="hk-go quiet" type="button" id="rushLeave">Back to the game</button><button class="hk-go primary" type="button" id="rushAgain">Again</button></div>
+</dialog>
+
+<dialog id="copyDlg" class="sheet hk-sheet" aria-labelledby="copyHead">
+  <div class="pick-head"><h2 id="copyHead">Copy</h2><button class="btn" type="button" id="copyClose">Close</button></div>
+  <p class="hk-note">This browser wouldn't copy it: select it here and copy.</p>
+  <textarea id="copyText" class="hk-copy" readonly></textarea>
+</dialog>
+
+<dialog id="nameDlg" class="sheet" aria-label="Your name">
+  <form method="dialog" id="nameForm">
+    <label for="nameInput">Your name, so your partner knows who's playing</label>
+    <input id="nameInput" maxlength="16" autocomplete="nickname" required>
+    <button class="btn primary wide" type="submit">Continue</button>
+  </form>
+</dialog>
+
+<p id="toast" class="hk-toast" role="status" aria-live="polite"></p>
+<script type="module" src="hong.js"></script>
+</body>
+</html>

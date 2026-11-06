@@ -1,0 +1,166 @@
+/* Hong's 3D view (Menu, View: 3D; hong-3d.js): the table as a jade cloth tipped away from you, the four walls standing
+   round it, each player's discards in a pool inside them, the others' hands and sets outside, the round's plate in the
+   middle; the others' plates across the top. Your seat's line, your tiles, the coach and the buttons are the page's own
+   (hong.css), drawn as slabs here. Sizes in the plane are set in script (hong-3d.js: --p a wall stack's width, --d a
+   discard's) and the plane's own height measured there, since container units resolved as nothing in a container laid
+   out late on a phone on its side. */
+:root {
+  --hk3-felt: #3F7A63; --hk3-felt-hi: #4F8D74; --hk3-felt-lo: #2B5B49;     /* the cloth: the game's own jade, deeper at its edges */
+  --hk3-rim: #8A6A2E;                                                       /* the table's edge, brass-dark */
+  --hk3-side: color-mix(in srgb, var(--hk-face) 78%, var(--hk-edge));      /* the ivory side of a tile */
+  --hk3-glow: #7FD1AE;                                                      /* a seat to move, a discard on offer */
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode="day"]) { --hk3-felt: #23493D; --hk3-felt-hi: #2D5C4C; --hk3-felt-lo: #17342B; --hk3-rim: #A8843C; }
+}
+html[data-mode="night"] { --hk3-felt: #23493D; --hk3-felt-hi: #2D5C4C; --hk3-felt-lo: #17342B; --hk3-rim: #A8843C; }
+
+.hk-board[hidden], .hk3-board[hidden] { display: none; }                 /* (their own display would win over the attribute) */
+.hk3-board { width: 100cqw; height: 100cqh; box-sizing: border-box; display: flex; flex-direction: column; gap: .4rem; min-height: 0; }
+
+/* ---------- the others' plates ---------- */
+.hk3-hud { flex: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; box-sizing: border-box; }
+.hk3-plate { --seat: var(--brass); position: relative; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: .45rem; align-items: center;
+  padding: .22rem .5rem .22rem .26rem; border: 1px solid color-mix(in srgb, var(--brass) 75%, transparent); border-radius: 5px; background: var(--sheet);
+  box-shadow: 0 .12rem .3rem rgba(0, 0, 0, .16); transition: border-color .2s, box-shadow .2s; }
+.hk3-plate.on { border-color: var(--hk-in); box-shadow: 0 0 0 1.5px var(--hk-in), 0 0 .7rem color-mix(in srgb, var(--hk-in) 55%, transparent); }
+.hk3-wind { grid-row: 1 / span 2; display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border: 1px solid var(--brass); border-radius: 4px; background: var(--tile);
+  font: 600 1.05rem "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; color: var(--ink); }
+.hk3-plate.dealer .hk3-wind { background: var(--hk-in); border-color: var(--hk-in); color: var(--sheet); }
+.hk3-nm { min-width: 0; font-size: .78rem; font-weight: 800; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hk3-sc { grid-column: 2; font-size: .72rem; font-weight: 700; line-height: 1.15; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+/* the tiles a player holds: a figure and a tile's back */
+.hk3-ct { position: absolute; right: .4rem; bottom: .2rem; display: inline-flex; align-items: center; gap: .22rem; font-size: .7rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.hk3-ct::after { content: ""; width: .5rem; height: .68rem; border-radius: 1.5px; background: var(--hk-back); box-shadow: 0 1px 0 var(--hk3-side); }
+.hk3-plate.thinking .hk3-ct { color: var(--hk-in); }
+/* too little width for names: the wind, the score and the count */
+.hk3-hud.tight .hk3-plate { grid-template-columns: auto; justify-items: center; padding: .2rem .3rem; row-gap: .05rem; }
+.hk3-hud.tight .hk3-nm { display: none; }
+.hk3-hud.tight .hk3-wind { grid-row: auto; width: 1.45rem; height: 1.45rem; font-size: .92rem; }
+.hk3-hud.tight .hk3-sc { grid-column: 1; }
+.hk3-hud.tight .hk3-ct { position: static; }
+
+/* ---------- the plane ---------- */
+.hk3-field { position: relative; flex: 1 1 auto; min-height: 0; }
+.hk3-stage { position: absolute; inset: 0; overflow: hidden; perspective: var(--eye, 800px); perspective-origin: 50% 100%; }
+.hk3-plane { position: absolute; left: 0; bottom: 0; width: var(--fw, 100%); height: var(--hp, 130%); transform-origin: 50% 100%; transform: rotateX(var(--tilt, 17deg)); }
+/* the cloth: jade, lighter in the middle, its edge a brass frame and, along the near side, the table's own thickness */
+.hk3-cloth { position: absolute; inset: 0; box-sizing: border-box; border: 2px solid var(--hk3-rim); border-radius: .7rem;
+  background: radial-gradient(ellipse 80% 62% at 50% 46%, var(--hk3-felt-hi), var(--hk3-felt) 62%, var(--hk3-felt-lo));
+  box-shadow: inset 0 0 0 .32rem var(--hk3-felt-lo), inset 0 0 0 calc(.32rem + 1px) color-mix(in srgb, var(--brass) 70%, transparent), inset 0 0 2.4rem rgba(0, 0, 0, .22), 0 .5rem 0 -.1rem var(--hk3-rim); }
+.hk3-world { position: absolute; inset: 0; }
+.hk3-world > * { position: absolute; left: 0; top: 0; box-sizing: border-box; transform-origin: 50% 50%; }
+.hk3-plane:not(.jump) .hk3-world > :is(.hk3-t, .hk3-w) { transition: transform .26s cubic-bezier(.3, .7, .2, 1); }
+
+/* a pool: where a player's discards lie, lit while it's their turn */
+.hk3-pool { pointer-events: none; border: 1px solid color-mix(in srgb, #FFF 16%, transparent); border-radius: .35rem; background: color-mix(in srgb, #000 9%, transparent); transition: border-color .2s, box-shadow .2s; }
+.hk3-pool.on { border-color: color-mix(in srgb, var(--hk3-glow) 85%, transparent); box-shadow: inset 0 0 .7rem color-mix(in srgb, var(--hk3-glow) 30%, transparent), 0 0 .5rem color-mix(in srgb, var(--hk3-glow) 35%, transparent); }
+
+/* the walls: a stack of two tiles lying face down, its green back up, its ivory sides toward you; the stack the next tile
+   comes from has a lighter top, the one the replacements come from a brass diamond */
+.hk3-w { --t: calc(var(--p) * .17); border-radius: 2px; border: 1px solid color-mix(in srgb, var(--hk-back) 55%, #000);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--hk-back) 80%, #FFF), var(--hk-back) 70%); pointer-events: none; }
+.hk3-w.n0 { visibility: hidden; }
+.hk3-w.n1 { box-shadow: 0 var(--t) 0 var(--hk3-side), 0 calc(var(--t) + 1px) 0 var(--hk-edge), 0 calc(var(--t) + 1px) .25rem rgba(0, 0, 0, .35); }
+.hk3-w.n2 { box-shadow: 0 var(--t) 0 var(--hk3-side), 0 calc(var(--t) + 1px) 0 var(--hk-edge), 0 calc(var(--t) * 2 + 1px) 0 var(--hk3-side), 0 calc(var(--t) * 2 + 2px) 0 var(--hk-edge), 0 calc(var(--t) * 2 + 2px) .3rem rgba(0, 0, 0, .35); }
+.hk3-w.head { background: linear-gradient(180deg, color-mix(in srgb, var(--hk-back) 55%, #FFF), color-mix(in srgb, var(--hk-back) 85%, #FFF)); }
+.hk3-w.tail::after { content: ""; position: absolute; left: 50%; top: 50%; width: 38%; aspect-ratio: 1; min-width: .2rem; transform: translate(-50%, -50%) rotate(45deg); background: var(--brass); }
+
+/* the tiles on the plane: slabs, lying (discards, sets, flowers) or standing hidden (the others' hands) */
+.hk3-t { display: block; padding: 0; border: 0; background: none; border-radius: 12%; cursor: default; -webkit-tap-highlight-color: transparent; box-shadow: 0 .1rem .2rem rgba(0, 0, 0, .38); }
+button.hk3-t { cursor: pointer; }
+.hk3-t.hidden { box-shadow: 0 .08rem .16rem rgba(0, 0, 0, .35); }
+.hk3-s { display: block; width: 100%; height: 100%; overflow: visible; }
+.hk3-t.small { border-radius: 14%; }
+.hk3-t.last { box-shadow: 0 0 0 2px var(--brass), 0 0 .55rem var(--brass), 0 .1rem .2rem rgba(0, 0, 0, .38); }
+.hk3-t.offer { animation: hk3-offer 1s ease-in-out infinite alternate; }
+@keyframes hk3-offer { from { box-shadow: 0 0 0 2px var(--hk3-glow), 0 0 .4rem var(--hk3-glow); } to { box-shadow: 0 0 0 3px var(--hk3-glow), 0 0 1.1rem var(--hk3-glow); } }
+.hk3-t.won { box-shadow: 0 0 0 2px var(--brass), 0 0 .8rem var(--brass); }
+.hk3-t.coming { opacity: 0; }
+.hk3-t:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+
+/* the plate in the middle: the round's wind, the wall's count, the round and hand; a small plate at each of its sides for
+   the seat there (the dealer's in jade, lit while it's that seat's turn); or the discard on offer to you */
+.hk3-centre { --u: 5rem; position: absolute; left: 0; top: 0; box-sizing: border-box; display: grid; place-items: center; border: 1.5px solid var(--brass); border-radius: .5rem;
+  background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--sheet) 92%, #FFF), var(--sheet));
+  box-shadow: inset 0 0 0 .22rem var(--sheet), inset 0 0 0 calc(.22rem + 1px) color-mix(in srgb, var(--brass) 65%, transparent), 0 .25rem .6rem rgba(0, 0, 0, .35); }
+.hk3-mid { display: flex; align-items: center; justify-content: center; gap: calc(var(--u) * .14); min-width: 0; max-width: 100%; padding: 0 calc(var(--u) * .22); box-sizing: border-box; }
+.hk3-cap { display: grid; gap: calc(var(--u) * .02); min-width: 0; text-align: left; }
+.hk3-cwind { font: 600 calc(var(--u) * .4) / 1 "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; color: var(--ink); }
+.hk3-count { font-size: max(.74rem, calc(var(--u) * .17)); font-weight: 800; line-height: 1.1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hk3-mid small { max-width: 100%; font-size: max(.56rem, calc(var(--u) * .1)); font-weight: 700; line-height: 1.15; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hk3-centre.slim .hk3-mid small { display: none; }
+.hk3-offer { display: block; width: calc(var(--u) * .4); aspect-ratio: 30 / 46; border-radius: 12%; box-shadow: 0 0 0 2px var(--hk3-glow), 0 0 .8rem var(--hk3-glow); animation: hk3-offer 1s ease-in-out infinite alternate; }
+.hk3-cb { position: absolute; display: grid; place-items: center; width: calc(var(--u) * .21); height: calc(var(--u) * .21); min-width: 1.05rem; min-height: 1.05rem; border: 1px solid var(--brass); border-radius: 3px; background: var(--tile);
+  font: 600 max(.7rem, calc(var(--u) * .14)) / 1 "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; font-style: normal; color: var(--ink); box-shadow: 0 .08rem .2rem rgba(0, 0, 0, .3); }
+.hk3-cb.dealer { background: var(--hk-in); border-color: var(--hk-in); color: var(--sheet); }
+.hk3-cb.on { box-shadow: 0 0 0 2px var(--hk3-glow), 0 0 .6rem var(--hk3-glow); }
+.hk3-cb.r0 { left: 50%; bottom: 0; transform: translate(-50%, 50%); }
+.hk3-cb.r2 { left: 50%; top: 0; transform: translate(-50%, -50%); }
+.hk3-cb.r1 { right: 0; top: 50%; transform: translate(50%, -50%); }
+.hk3-cb.r3 { left: 0; top: 50%; transform: translate(-50%, -50%); }
+
+/* the end of a hand, across the table */
+.hk3-banner { position: absolute; z-index: 4; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: grid; place-items: center; pointer-events: none; }
+.hk3-banner:not(.show) { display: none; }
+.hk3-banner span { box-sizing: border-box; width: 100%; padding: .7rem 1.5rem; text-align: center; background: linear-gradient(90deg, transparent, var(--plate) 14%, var(--plate) 86%, transparent); color: var(--plate-ink);
+  font-size: 1.05rem; font-weight: 800; font-stretch: var(--wide); text-transform: var(--caps); letter-spacing: .16em; white-space: nowrap; }
+
+/* a tile read: tapped, large over the table (tap it to put it down) */
+.hk3-look { position: absolute; z-index: 5; left: 50%; top: 46%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: .3rem; padding: .8rem 1.4rem .7rem; border: 1.5px solid var(--brass); border-radius: 6px;
+  background: var(--sheet); color: var(--ink); font: inherit; text-align: center; cursor: pointer; box-shadow: 0 1rem 2.4rem rgba(0, 0, 0, .45); }
+.hk3-look[hidden] { display: none; }
+.hk3-lk { display: block; width: 5.6rem; filter: drop-shadow(0 .3rem .25rem rgba(0, 0, 0, .35)); }
+.hk3-look b { font-size: .95rem; font-weight: 800; }
+.hk3-look small { font-size: .74rem; color: var(--ink-soft); }
+
+/* ---------- your tiles and your seat, in this view ---------- */
+html #app.hong.hk3 .hk-table { background: none; border-color: transparent; box-shadow: none; }
+html #app.hong.hk3 .hk-tile { filter: drop-shadow(0 .18rem .12rem rgba(0, 0, 0, .3)); }
+html #app.hong.hk3 .hk-tile.picked { transform: translateY(-.7rem); }
+html #app.hong.hk3 .hk-me { padding: .15rem .5rem .15rem .2rem; border: 1px solid color-mix(in srgb, var(--brass) 75%, transparent); border-radius: 5px; background: var(--sheet); box-shadow: 0 .12rem .3rem rgba(0, 0, 0, .14); }
+html #app.hong.hk3 .hk-me.on { border-color: var(--hk-in); box-shadow: 0 0 0 1.5px var(--hk-in), 0 0 .7rem color-mix(in srgb, var(--hk-in) 55%, transparent); }
+html #app.hong.hk3 .hk-hand { min-height: calc(var(--hk-t) * 46 / 30 + .55rem); }
+html #app.hong.hk3 .hk-hand.grid { min-height: calc(var(--rows) * var(--hk-t) * 46 / 30 + (var(--rows) - 1) * .4rem + .55rem); }
+html #app.hong.hk3 .hk-grid { grid-template-rows: repeat(var(--rows), calc(var(--hk-t) * 46 / 30)); }
+html #app.hong.hk3 .hk-go { min-height: 2.9rem; }
+
+/* ---------- motion ---------- */
+.hk3-fx { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+.hk3-ghost { position: fixed; perspective: 40rem; }
+.hk3-gin { position: absolute; inset: 0; transform-style: preserve-3d; }
+.hk3-gf, .hk3-gb { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.hk3-gb { transform: rotateY(180deg); }
+.hk3-gf > .hk3-s, .hk3-gb > .hk3-s { filter: drop-shadow(0 .35rem .3rem rgba(0, 0, 0, .4)); }
+.hk3-board.paused :is(.hk3-t.offer, .hk3-offer) { animation-play-state: paused; }
+
+/* ---------- full screen: the header's buttons lie over the board's top right (hong.css puts the header in the table); the
+   plates keep left of them, and the plane starts under them ---------- */
+html #app.hong.hk3.ontable .hk-table { padding: .3rem; }
+
+/* ---------- held sideways ---------- */
+@media (orientation: landscape) and (min-width: 700px) {
+  .hk3-hud { gap: .5rem; }
+  .hk3-plate { padding: .26rem .6rem .26rem .3rem; }
+}
+/* a phone on its side: the plane is all the height there is: the plates are a single line, the cloth takes the rest */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 500px) {
+  html #app.hong.hk3 .hk-table { padding: 0; background: none; border: 0; box-shadow: none; }
+  .hk3-board { height: calc(100cqh - var(--hk-reserve, 4.3rem)); gap: .3rem; }
+  .hk3-plate { grid-template-columns: auto minmax(0, 1fr) auto auto; grid-template-rows: auto; padding: .12rem .4rem .12rem .2rem; column-gap: .35rem; }
+  .hk3-wind { grid-row: auto; width: 1.35rem; height: 1.35rem; font-size: .9rem; }
+  .hk3-sc { grid-column: auto; }
+  .hk3-ct { position: static; }
+  html #app.hong.hk3 .hk-hand { z-index: 1; }
+  html #app.hong.hk3.ontable .hk-table { padding: 0 calc(11.5rem + 1.25rem) 0 0; }
+}
+
+/* ---------- the themes: Codex's frame is its own ---------- */
+html[data-theme="office"] .hk3-cloth { border-width: 1px; border-color: var(--tile-edge); box-shadow: inset 0 0 2.4rem rgba(0, 0, 0, .2), 0 .5rem 0 -.1rem var(--hk3-felt-lo); }
+html[data-theme="office"] .hk3-centre { box-shadow: 0 .25rem .6rem rgba(0, 0, 0, .35); border-width: 1px; border-color: var(--tile-edge); }
+html[data-theme="office"] .hk3-pool { border-color: color-mix(in srgb, #FFF 12%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hk3-t.offer, .hk3-offer { animation: none; }
+  .hk3-plane .hk3-world > :is(.hk3-t, .hk3-w) { transition: none; }
+}

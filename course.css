@@ -1,0 +1,133 @@
+/* A game's course (course.js): a sheet over the whole screen, River's course's look (river.css) for the games that
+   aren't on a board. The map of chapters and lessons; a lesson's stage (what the game draws: cards, dice) taking the
+   room the words leave it, the words and the buttons under it, or beside it held sideways. The game's enamel is
+   --ln-in, which each game's stylesheet sets on its sheet (.ln-sheet.<its class>). */
+dialog.ln-sheet { --ln-in: var(--brass); --ln-ok: #2F7D5B; --ln-no: #A8382B;
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0;
+  background: var(--yard); color: var(--ink); overflow: hidden; }
+@media (prefers-color-scheme: dark) { html:not([data-mode="day"]) dialog.ln-sheet { --ln-ok: #7FC2A8; --ln-no: #E8806F; } }
+html[data-mode="night"] dialog.ln-sheet { --ln-ok: #7FC2A8; --ln-no: #E8806F; }
+dialog.ln-sheet::backdrop { background: var(--yard); }
+.ln-in { display: flex; flex-direction: column; height: 100%; box-sizing: border-box; max-width: 40rem; margin: 0 auto;
+  padding: max(.6rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + .6rem) max(1rem, env(safe-area-inset-left, 0px)); }
+.ln-head { flex: none; display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem; align-items: center; gap: .5rem; padding-bottom: .5rem; border-bottom: 1px solid var(--brass); }
+.ln-title { display: grid; justify-items: center; min-width: 0; line-height: 1.2; }
+.ln-title b { max-width: 100%; font-size: .92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); }
+.ln-title small { color: var(--ink-soft); font-size: .8rem; }
+dialog.ln-sheet:not(.map) .ln-map, dialog.ln-sheet.map .ln-lesson { display: none; }
+
+/* the map */
+.ln-map { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: .7rem 0 .4rem; }
+.ln-start { width: 100%; margin-bottom: .4rem; }
+.ln-all { color: var(--ink-soft); text-align: center; }
+.ln-ch h3 { margin: .9rem 0 .35rem; font-size: .76rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.12em * var(--track)); text-transform: var(--caps); color: var(--ln-in); }
+.ln-ch h3 span { margin-left: .4rem; letter-spacing: 0; text-transform: none; font-stretch: normal; color: var(--ink-soft); }
+.ln-ch ol { margin: 0; padding: 0; list-style: none; display: grid; gap: .3rem; }
+.ln-ch li button { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr) auto; gap: .5rem; align-items: center; width: 100%; padding: .55rem .6rem; text-align: left;
+  border: 1.5px solid var(--tile-edge); border-radius: 6px; background: var(--tile); color: var(--ink); font: inherit; cursor: pointer; }
+.ln-ch li button.here { border-color: var(--ln-in); box-shadow: inset 0 0 0 1.5px var(--ln-in); }
+.ln-ch li button.done { color: var(--ink-soft); }
+.ln-ch .tick { font-weight: 800; color: var(--ln-ok); text-align: center; }
+.ln-ch .here .tick { color: var(--ln-in); }
+.ln-ch .t { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ln-ch .zh { color: var(--ink-soft); white-space: nowrap; }
+.ln-rules { width: 100%; margin-top: 1rem; }
+
+/* a lesson: the stage as large as the room the words leave it */
+.ln-lesson { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: .5rem; padding-top: .45rem; }
+.ln-stage { flex: 1 1 auto; min-height: 9rem; container-type: size; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; overflow: hidden; }
+.ln-side { flex: none; display: flex; flex-direction: column; gap: .5rem; min-height: 0; }
+.ln-text { min-height: 4.6rem; max-height: 36vh; max-height: 36svh; overflow-y: auto; overscroll-behavior: contain; }
+.ln-text p { margin: 0 0 .45rem; font-size: .95rem; line-height: 1.42; }
+.ln-say { font-weight: 600; }
+.ln-msg { padding: .45rem .6rem; border-radius: 4px; }
+.ln-msg.ok { background: color-mix(in srgb, var(--ln-ok) 15%, var(--sheet)); }
+.ln-msg.no { background: color-mix(in srgb, var(--ln-no) 13%, var(--sheet)); }
+.ln-quiz { display: grid; gap: .4rem; margin: .2rem 0 .5rem; }
+.ln-quiz.row { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.ln-quiz.row .ln-opt { padding: .45rem .3rem; text-align: center; }
+.ln-opt { min-height: 2.75rem; padding: .45rem .7rem; text-align: left; border: 1.5px solid var(--tile-edge); border-radius: 6px; background: var(--tile); color: var(--ink); font: inherit; cursor: pointer; }
+.ln-opt.ok { border-color: var(--ln-ok); background: color-mix(in srgb, var(--ln-ok) 15%, var(--sheet)); }
+.ln-opt.no { border-color: var(--ln-no); }
+.ln-opt:disabled { cursor: default; }
+.ln-bar { display: flex; gap: .5rem; }
+.ln-go { flex: 1 1 0; min-width: 0; min-height: 2.75rem; padding: 0 .8rem; border: 0; border-radius: 4px; background: var(--plate); color: var(--plate-ink); font: inherit; font-size: .84rem; font-weight: 800;
+  font-stretch: 106%; letter-spacing: calc(.06em * var(--track)); text-transform: var(--caps); outline: 1px solid color-mix(in srgb, var(--plate-ink) 55%, transparent);
+  outline-offset: -5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ln-go.quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--brass); outline: 0; }
+.ln-go:disabled { opacity: .4; cursor: default; }
+.ln-go[hidden] { display: none; }
+html[data-theme="office"] :is(.ln-ch li button, .ln-opt) { border-radius: 4px; }
+
+/* held sideways: the stage on the left with all the height, the words and the buttons beside it */
+@media (orientation: landscape) and (min-width: 700px) {
+  .ln-in { max-width: 70rem; }
+  .ln-lesson { display: grid; grid-template-columns: minmax(0, 1fr) 22rem; column-gap: 1.5rem; }
+  .ln-stage { min-height: 0; }
+  .ln-side { min-height: 0; justify-content: flex-end; }
+  .ln-text { flex: 1 1 auto; max-height: none; }
+  .ln-map { columns: 2; column-gap: 2rem; }
+  .ln-start, .ln-ch, .ln-rules { break-inside: avoid; }
+}
+
+/* ---------- the card games' stage (course-cards.js): examples with their names, the play to beat, your hand ---------- */
+.lc { display: grid; grid-template-columns: minmax(0, 1fr); gap: .55rem; justify-items: center; align-content: center; min-width: 0; min-height: 0; padding: .3rem 0;
+  --cd-line: clamp(.62rem, min(5.2cqh, 4.6cqw), 1.25rem); }
+.lc-row { display: grid; justify-items: center; gap: .2rem; max-width: 100%; }
+.lc-row > small { font-size: .74rem; font-weight: 800; color: var(--ink-soft); font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); }
+.lc-row > small i { font-style: normal; text-transform: none; letter-spacing: 0; font-stretch: normal; font-weight: 600; color: var(--ln-in); }
+.lc-row .cd-line { flex-wrap: nowrap; max-width: 100%; }
+.lc-row .cd-line.many > .cd + .cd { margin-left: -1.6em; }
+.lc-word { font-size: 1.05rem; font-weight: 800; color: var(--ln-in); }
+.lc-table { padding: .45rem .7rem; border-radius: 6px; background: color-mix(in srgb, var(--ln-in) 8%, var(--sheet)); border: 1px solid var(--tile-edge); }
+.lc-hand { width: 100%; height: calc(var(--cd-size, 1rem) * 3.5 + .9rem); padding-top: .55rem; box-sizing: border-box; justify-content: center; }
+.lc-hand .cd { cursor: pointer; transition: transform .12s ease; }
+.lc-hand.still .cd { cursor: default; }
+.lc-hand .cd.sel { transform: translateY(-.45rem); background: color-mix(in srgb, var(--ln-in) 18%, var(--cd-face)); border-color: var(--ln-in); box-shadow: 0 0 0 1.5px var(--ln-in); }
+.lc-hand.done .cd { cursor: default; }
+@media (prefers-reduced-motion: reduce) { .lc-hand .cd { transition: none; } }
+
+/* ---------- the dice games' stage (course-dice.js): cups lifted and down, bids, a bid to set ---------- */
+.ldi { --ldi-die: 2.4rem; gap: .5rem; }
+.ldi .bo-die { width: var(--ldi-die); height: var(--ldi-die); }
+.ldi-dice { display: flex; gap: calc(var(--ldi-die) * .16); }
+.ldi-die-btn { padding: 0; border: 0; background: none; cursor: pointer; border-radius: 6px; }
+.ldi-die-btn:focus-visible { outline: 2px solid var(--ln-in); outline-offset: 2px; }
+.ldi .bo-die.lit rect { stroke: var(--ln-in); stroke-width: 2.6; }
+.ldi .bo-die.lit.hinted rect { stroke-dasharray: 3 2; }
+.ldi .bo-die.dim { opacity: .3; }
+.ldi-cups { display: flex; gap: calc(var(--ldi-die) * .2); }
+.ldi-cup { width: var(--ldi-die); height: var(--ldi-die); }
+.ldi-cup .body { fill: var(--ln-in); stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; }
+.ldi-cup .band { fill: none; stroke: var(--brass); stroke-width: 1.5; }
+.ldi-cup .rim { stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; }
+.ldi-bid { display: inline-flex; align-items: center; gap: .3rem; font-size: calc(var(--ldi-die) * .7); font-weight: 800; font-variant-numeric: tabular-nums; }
+.ldi-bid .x { font-weight: 500; opacity: .55; }
+.ldi .ldi-bid .bo-die { width: calc(var(--ldi-die) * .9); height: calc(var(--ldi-die) * .9); }
+.ldi-zhai { padding: 0 .3rem; border-radius: 3px; background: var(--ln-in); color: var(--sheet); font-size: .62em; line-height: 1.35; }
+.ldi-found { margin: 0; font-size: .8rem; color: var(--ink-soft); }
+.ldi-set { display: grid; gap: .45rem; justify-items: center; width: 100%; max-width: 22rem; }
+.ldi-count { display: flex; align-items: center; gap: .5rem; }
+.ldi-step, .ldi-z, .ldi-face { min-width: 2.75rem; min-height: 2.75rem; border: 1.5px solid var(--tile-edge); border-radius: 6px; background: var(--tile); color: var(--ink); font: inherit; cursor: pointer; }
+.ldi-step { font-size: 1.3rem; font-weight: 700; line-height: 1; }
+.ldi-n { min-width: 2.2rem; text-align: center; font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ldi-z { display: grid; justify-items: center; padding: .1rem .6rem; font-weight: 800; line-height: 1.1; }
+.ldi-z small { font-size: .62rem; font-weight: 600; color: var(--ink-soft); }
+.ldi-z[aria-pressed="true"], .ldi-face[aria-pressed="true"] { border-color: var(--ln-in); box-shadow: inset 0 0 0 1.5px var(--ln-in); background: color-mix(in srgb, var(--ln-in) 12%, var(--tile)); }
+.ldi-faces { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .35rem; width: 100%; }
+.ldi-face { display: grid; place-items: center; padding: .2rem; }
+.ldi .ldi-face .bo-die { width: min(calc(var(--ldi-die) * .8), 2rem); height: min(calc(var(--ldi-die) * .8), 2rem); }
+.ldi-step:disabled, .ldi-z:disabled, .ldi-face:disabled { opacity: .45; cursor: default; }
+.ldi-says { margin: 0; min-height: 1.1rem; font-size: .8rem; color: var(--ln-no); }
+
+/* ---------- a puzzle rush on the course's sheet (rush-sheet.js): the run's rows before and after, the verdict ---------- */
+/* before a run: how the last one went or your best on the clock, then the next run's choices, the same controls as a
+   menu's (rush-menu.js) */
+.rush-setup { display: grid; gap: 1.1rem; align-content: center; width: min(100%, 24rem); margin: 0 auto; }
+.rush-pick > .menu-row { margin: .35rem 0; }
+.rush-rows { display: grid; gap: .55rem; justify-items: center; align-content: center; text-align: center; }
+.rush-row { display: grid; gap: .2rem; justify-items: center; }
+.rush-row > small { font-size: .74rem; font-weight: 800; color: var(--ink-soft); font-stretch: var(--wide); letter-spacing: calc(.08em * var(--track)); text-transform: var(--caps); }
+.rush-row > b { font-size: 1.05rem; font-weight: 800; color: var(--ln-in); }
+.rush-hit { color: var(--ln-ok); }
+.rush-miss { color: var(--ln-no); }

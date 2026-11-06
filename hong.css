@@ -1,0 +1,258 @@
+/* Mahjong: a jade table under brass, ivory tiles with green backs. The table is one SVG drawn to its box (hong.js picks
+   its proportions); your tiles are buttons below it, sized to the row; the tiles themselves are symbols from
+   hong-tiles.js, coloured from the variables here so they follow the theme. */
+:root {
+  --hk-in: #2F6E58;                                             /* jade: the game's accent */
+  --hk-in-soft: color-mix(in srgb, var(--hk-in) 15%, var(--sheet));
+  --hk-felt: color-mix(in srgb, #4E8A5E 13%, var(--sheet));    /* the cloth: a warm green, never a grey */
+  --hk-face: #F7F1E1; --hk-edge: #B9A47A; --hk-back: #2F6B4F; --hk-back-line: #7FB59A;
+  --hk-ink: #1E2730; --hk-red: #B3302A; --hk-green: #24734A; --hk-blue: #244E8C;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode="day"]) { --hk-in: #79C4A6; --hk-felt: color-mix(in srgb, #2F6E58 22%, var(--sheet)); --hk-face: #E9E2CF; --hk-edge: #7E6C4B; --hk-back: #24563F; --hk-back-line: #5E9C80; }
+}
+/* night, set in Settings */
+html[data-mode="night"] { --hk-in: #79C4A6; --hk-felt: color-mix(in srgb, #2F6E58 22%, var(--sheet)); --hk-face: #E9E2CF; --hk-edge: #7E6C4B; --hk-back: #24563F; --hk-back-line: #5E9C80; }
+
+.hk-mark { display: inline-block; }
+.hk-mark svg { width: 100%; height: 100%; display: block; }
+.hk-t { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; overflow: visible; }
+.hk-t.slab { aspect-ratio: 30 / 46; }                           /* the 3D view's thicker tile (hong-tiles.js) */
+
+/* ---------- the table ---------- */
+.hk-table { margin-top: .5rem; }
+.hk-board { width: 100cqw; height: 100cqh; display: block; box-sizing: border-box; border-radius: 6px; background: var(--hk-felt);
+  border: 1px solid var(--tile-edge); box-shadow: inset 0 0 0 4px var(--hk-felt), inset 0 0 0 5px var(--rule); }
+.hk-board .hk-badge { fill: var(--sheet); stroke: var(--brass); stroke-width: 1; }
+.hk-board .hk-badge.dealer { fill: var(--hk-in); stroke: var(--hk-in); }
+.hk-board .hk-badge-t { font: 600 10.5px "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; text-anchor: middle; fill: var(--ink); }
+.hk-board .hk-badge.dealer + .hk-badge-t { fill: var(--sheet); }
+.hk-board .hk-name { font: 700 10.5px var(--font); fill: var(--ink); }
+.hk-board .hk-score { font-weight: 600; fill: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.hk-board .hk-count { font: 600 9.5px var(--font); fill: var(--ink-soft); text-anchor: end; }
+.hk-board .hk-label.on .hk-name { fill: var(--hk-in); }
+.hk-board .hk-label.on .hk-badge:not(.dealer) { stroke: var(--hk-in); stroke-width: 2; }
+.hk-board .hk-label.thinking .hk-count { fill: var(--hk-in); font-weight: 800; }
+.hk-board .hk-last-ring { fill: none; stroke: var(--brass); stroke-width: 1.6; }
+.hk-board .hk-dial circle { fill: var(--sheet); stroke: var(--brass); stroke-width: 1.2; }
+/* the dial's words are sized to it where it's drawn (hong.js's dialAt) */
+.hk-board .hk-dial-wind { font: 600 18px "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; text-anchor: middle; fill: var(--ink); }
+.hk-board .hk-dial-t { font: 600 9px var(--font); text-anchor: middle; fill: var(--ink-soft); letter-spacing: .02em; }
+.hk-board .hk-turn { fill: none; stroke: var(--hk-in); stroke-width: 3.2; stroke-linecap: round; }   /* toward whoever is to move */
+
+/* ---------- your seat, your tiles ---------- */
+.hk-mine { display: flex; align-items: center; gap: .5rem; min-height: 1.75rem; margin-top: .45rem; font-size: .86rem; color: var(--ink-soft); }
+.hk-me { display: inline-flex; align-items: center; gap: .35rem; color: var(--ink); white-space: nowrap; }
+.hk-me .hk-wind { display: inline-grid; place-items: center; width: 1.3rem; height: 1.3rem; border: 1px solid var(--brass); border-radius: 3px; background: var(--sheet);
+  font: 600 .85rem "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; }
+.hk-me .hk-wind.dealer { background: var(--hk-in); border-color: var(--hk-in); color: var(--sheet); }
+.hk-me.on .hk-me-name { color: var(--hk-in); }
+.hk-me-name { font-weight: 800; }
+.hk-me-score { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+.hk-me-flowers { display: inline-flex; gap: 1px; }
+.hk-mini { width: 1.05rem; height: auto; display: inline-block; vertical-align: middle; }
+.hk-me-flowers .hk-mini { width: .95rem; }
+.hk-me-rule { margin-left: auto; font-size: .78rem; text-align: right; }
+
+.hk-hand { --hk-t: 1.6rem; display: flex; align-items: flex-end; gap: calc(var(--hk-t) * .28); min-height: calc(var(--hk-t) * 4 / 3 + .55rem); padding-top: .55rem; }
+.hk-concealed { display: flex; align-items: flex-end; }
+.hk-tile { flex: none; width: var(--hk-t); padding: 0; border: 0; background: none; position: relative; cursor: default; -webkit-user-select: none; user-select: none;
+  transition: transform .12s; filter: drop-shadow(0 1px 0 color-mix(in srgb, var(--ink) 18%, transparent)); }
+.hk-concealed.live .hk-tile { cursor: pointer; }
+.hk-tile.drawn { margin-left: calc(var(--hk-t) * .35); }
+.hk-tile.picked { transform: translateY(-.55rem); }
+/* the coach's tile: a jade bar under it */
+.hk-tile.advised::after { content: ""; position: absolute; left: 18%; right: 18%; bottom: -.3rem; height: .1875rem; border-radius: 2px; background: var(--hk-in); }
+.hk-melds { display: flex; align-items: flex-end; gap: calc(var(--hk-t) * .22); }
+.hk-meld { display: flex; }
+.hk-meld .hk-t { width: calc(var(--hk-t) * .74); }
+/* your tiles in rows (Menu, upright; hong.js's drawHand): sections filled down their columns, two rows (1 3 5 / 2 4 6)
+   or three by suit, the drawn tile a section of its own and your sets one more, each row the same height whatever the
+   hand holds, so the rows never change the table's size between calls */
+.hk-hand.grid { align-items: flex-start; gap: calc(var(--hk-t) * .35); min-height: calc(var(--rows) * var(--hk-t) * 4 / 3 + (var(--rows) - 1) * .4rem + .55rem); }
+.hk-hand.grid .hk-concealed { align-items: flex-start; gap: calc(var(--hk-t) * .35); }
+.hk-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows), calc(var(--hk-t) * 4 / 3)); row-gap: .4rem; }
+.hk-hand.grid .hk-tile.drawn { margin-left: 0; }
+.hk-hand.grid .hk-tile.picked { transform: translateY(-.3rem); }
+.hk-hand.grid .hk-melds { display: grid; grid-auto-flow: column; grid-template-rows: repeat(var(--rows), auto); align-content: start; row-gap: .4rem; column-gap: calc(var(--hk-t) * .22); }
+
+/* ---------- your move ---------- */
+.hk-bar { display: grid; gap: .4rem; padding-top: .5rem; min-height: 3.1rem; }
+.hk-coach { margin: 0; font-size: .84rem; line-height: 1.35; color: var(--ink); }
+.hk-coach b { margin-right: .3rem; color: var(--hk-in); font-size: .72rem; font-weight: 800; font-stretch: var(--wide); text-transform: var(--caps); letter-spacing: calc(.1em * var(--track)); }
+.hk-coach .hk-thinking { color: var(--ink-soft); }
+/* a coach that speaks unasked keeps its room, so the table holds its size as it speaks and falls quiet: on a phone four
+   lines, all it says but now and then a longer reason, which scrolls in its box; a puzzle's question and its verdict
+   take three */
+.hk-coach.kept { min-height: calc(2em * 1.35); }
+@media (max-width: 599px) {
+  .hk-coach.rush { min-height: calc(3em * 1.35); }
+  .hk-coach.kept { height: calc(4em * 1.35); overflow-y: auto; overscroll-behavior: contain; }
+}
+.hk-why-btn { font-size: .84rem; }
+.hk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; min-height: 2.75rem; }
+.hk-go { min-height: 2.75rem; padding: 0 1rem; border: 0; border-radius: 4px; background: var(--plate); color: var(--plate-ink); font: inherit; font-size: .84rem; font-weight: 800;
+  font-stretch: 106%; letter-spacing: calc(.06em * var(--track)); text-transform: var(--caps); outline: 1px solid color-mix(in srgb, var(--plate-ink) 55%, transparent); outline-offset: -5px; cursor: pointer; }
+.hk-go.primary { background: var(--hk-in); color: var(--sheet); outline-color: color-mix(in srgb, var(--sheet) 50%, transparent); }
+.hk-go.quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--brass); outline: 0; }
+.hk-go.chow { display: inline-flex; align-items: center; gap: 1px; padding: 0 .55rem; background: var(--sheet); box-shadow: inset 0 0 0 1.5px var(--hk-in); outline: 0; }
+.hk-go.chow .hk-mini { width: 1.3rem; }
+.hk-wait, .hk-claim { margin: 0; font-size: .9rem; color: var(--ink-soft); }
+.hk-claim { display: inline-flex; align-items: center; gap: .35rem; color: var(--ink); font-weight: 650; flex-basis: 100%; }
+.hk-claim .hk-mini { width: 1.35rem; }
+
+/* ---------- the sheets: the rules, a hand's end, the coach's reasons ---------- */
+dialog.hk-sheet { max-height: 88vh; max-height: 88svh; overflow-y: auto; overscroll-behavior: contain; }
+#rulesDlg, #whyDlg { padding-top: 0; }
+#rulesDlg .pick-head, #whyDlg .pick-head { position: -webkit-sticky; position: sticky; top: 0; z-index: 1; background: var(--sheet); padding-top: 1rem; }
+.hk-rules p, .hk-why p { margin: .5rem 0; font-size: .92rem; line-height: 1.45; }
+.hk-fan, .hk-scores, .hk-cands { width: 100%; border-collapse: collapse; margin: .4rem 0 .6rem; font-size: .88rem; }
+.hk-fan td, .hk-scores td, .hk-cands td, .hk-cands th { padding: .28rem .35rem; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.hk-fan .zh { width: 5.5rem; font-family: "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; color: var(--hk-in); white-space: nowrap; }
+.hk-fan .n, .hk-scores .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.hk-fan .total td { border-bottom: 0; font-weight: 800; }
+.hk-scores .me td { font-weight: 800; }
+.hk-scores .tot { color: var(--ink); }
+.hk-scores td:first-child { width: 1.6rem; font-family: "Songti TC", "STSong", "Noto Serif CJK TC", "Hiragino Mincho ProN", serif; }
+.hk-result-head { margin: 0 0 .5rem; font-size: 1.1rem; }
+.hk-win-hand { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1px; margin: .3rem 0 .5rem; }
+.hk-win-hand > .hk-t { width: 1.65rem; }
+.hk-win-hand .hk-meld .hk-t { width: 1.4rem; }
+.hk-win-hand .hk-won { transform: translateY(-.3rem); filter: drop-shadow(0 0 0 var(--hk-in)) drop-shadow(0 2px 0 var(--hk-in)); }
+.hk-gap { width: .45rem; }
+.hk-pay-line, .hk-final, .hk-review-lead { margin: .35rem 0; font-size: .92rem; }
+.hk-final { font-weight: 800; }
+.hk-sub { margin: .9rem 0 .2rem; font-size: .72rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.12em * var(--track)); text-transform: var(--caps); color: var(--hk-in); }
+.hk-review { margin: .3rem 0; padding-left: 1.1rem; font-size: .88rem; line-height: 1.4; }
+.hk-review li { margin: .3rem 0; }
+.hk-when { color: var(--ink-soft); font-size: .8rem; margin-right: .2rem; }
+.hk-result-go { display: flex; gap: .5rem; justify-content: flex-end; margin-top: .8rem; }
+.hk-result-go .hk-go { flex: 1 1 0; }
+.hk-why-lead { font-weight: 650; }
+/* the choices in words: the coach's first, each with what speaks for it (+) and against it (−) */
+.hk-opts { margin: .4rem 0 .6rem; padding: 0; list-style: none; display: grid; gap: .45rem; }
+.hk-opt { padding: .45rem .6rem; border: 1px solid var(--rule); border-radius: 5px; font-size: .9rem; }
+.hk-opt.best { border-color: var(--hk-in); background: var(--hk-in-soft); }
+.hk-pc { margin: .25rem 0 0; padding: 0; list-style: none; display: grid; gap: .12rem; font-size: .84rem; line-height: 1.38; }
+.hk-pc li { position: relative; padding-left: 1rem; }
+.hk-pc li::before { position: absolute; left: 0; top: 0; font-weight: 800; }
+.hk-pc .pro::before { content: "+"; color: #2F7D5B; }
+.hk-pc .con::before { content: "−"; color: #A8382B; }
+@media (prefers-color-scheme: dark) { html:not([data-mode="day"]) .hk-pc .pro::before { color: #7FC2A8; } html:not([data-mode="day"]) .hk-pc .con::before { color: #E8806F; } }
+html[data-mode="night"] .hk-pc .pro::before { color: #7FC2A8; }
+html[data-mode="night"] .hk-pc .con::before { color: #E8806F; }
+/* the puzzle rush: where you are in the run, the verdict, your move among the coach's options, the score */
+.hk-rush { font-variant-numeric: tabular-nums; }
+.hk-rush b { color: var(--hk-in); }
+.hk-strikes { letter-spacing: .08em; color: #A8382B; }
+.hk-coach b.hk-hit { color: #2F7D5B; }
+.hk-coach b.hk-miss { color: #A8382B; }
+.hk-yours { margin-left: .4rem; padding: 0 .3rem; border: 1px solid var(--rule); border-radius: 3px; font-size: .7rem; font-weight: 700; color: var(--ink-soft);
+  text-transform: var(--caps); letter-spacing: calc(.06em * var(--track)); }
+.hk-opt.missed { border-color: #A8382B; }
+.hk-rush-score { margin: .2rem 0; font-size: 1rem; }
+.hk-rush-score b { font-size: 2.2rem; font-weight: 800; color: var(--hk-in); margin-right: .3rem; }
+.hk-rush-sub { margin: .2rem 0 .4rem; font-size: .9rem; color: var(--ink-soft); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-mode="day"]) .hk-strikes, html:not([data-mode="day"]) .hk-coach b.hk-miss { color: #E8806F; }
+  html:not([data-mode="day"]) .hk-coach b.hk-hit { color: #7FC2A8; }
+  html:not([data-mode="day"]) .hk-opt.missed { border-color: #E8806F; }
+}
+html[data-mode="night"] .hk-strikes, html[data-mode="night"] .hk-coach b.hk-miss { color: #E8806F; }
+html[data-mode="night"] .hk-coach b.hk-hit { color: #7FC2A8; }
+html[data-mode="night"] .hk-opt.missed { border-color: #E8806F; }
+.hk-cands { font-size: .82rem; }
+.hk-cands th { font-size: .66rem; font-weight: 800; text-align: left; color: var(--ink-soft); text-transform: var(--caps); letter-spacing: calc(.06em * var(--track)); }
+.hk-cands tr.best td { background: var(--hk-in-soft); font-weight: 700; }
+.hk-cands .hk-mini { width: 1.2rem; }
+.hk-cands small { display: block; font-size: .72rem; font-weight: 500; color: var(--ink-soft); }
+.hk-note { font-size: .8rem !important; color: var(--ink-soft); }
+.hk-threats { margin: .3rem 0; padding-left: 1.1rem; font-size: .88rem; }
+
+/* Copy turn and Copy game, where the browser wouldn't copy: the words to select by hand */
+.hk-copy { display: block; width: 100%; height: 55vh; box-sizing: border-box; padding: .5rem; border: 1px solid var(--rule); border-radius: 4px; resize: none;
+  background: var(--tile); color: var(--ink); font: .76rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.hk-toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 1.2rem); transform: translateX(-50%); z-index: 40;
+  max-width: min(92vw, 30rem); margin: 0; padding: .55rem .9rem; border-radius: 4px; background: var(--ink); color: var(--yard);
+  font-weight: 650; font-size: .95rem; text-align: center; opacity: 0; pointer-events: none; transition: opacity .18s; }
+.hk-toast.show { opacity: 1; }
+
+/* the coach's four ways side by side in the menu, off to always, as a scale */
+#menuBody .menu-grid[aria-label="Coach"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Full screen (Menu; hong.js's placeFull puts the header inside the table): the cloth is the whole section, the
+   drawing on it, and the header's buttons lie over its top right, where the drawing keeps the player across clear of
+   them (drawTable), so the header's whole row goes to the table */
+#app.hong.ontable .hk-table { position: relative; margin-top: 0; padding: .3rem; border-radius: 6px; border: 1px solid var(--tile-edge);
+  background: var(--hk-felt); box-shadow: inset 0 0 0 4px var(--hk-felt), inset 0 0 0 5px var(--rule); }
+#app.hong.ontable .hk-board { background: none; border: 0; border-radius: 0; box-shadow: none; }
+#app .hk-table > .top { position: absolute; top: .4rem; right: .45rem; z-index: 2; padding: 0; background: none; border: 0; gap: .3rem; }   /* over every theme's rule under a header */
+.hk-table > .top .mark-btn { font-size: 0; gap: 0; }
+.hk-table > .top .partner-pill { display: none; }
+.hk-table > .top .mark-icon { width: 2.1rem; height: 2.1rem; }
+.hk-table > .top .top-right { gap: .3rem; }
+.hk-table > .top .pick { min-height: 2.1rem; padding: .2rem .5rem; font-size: .72rem; }
+.hk-table > .top .cx-btn { width: 2.25rem; height: 2.25rem; }
+.hk-table > .top .cx-btn .cx { width: 2.1rem; height: 2.1rem; }
+
+/* held sideways: the table on the left with all the height but your tiles' row under it, your seat and your move in
+   the column beside it, the buttons low */
+
+@media (orientation: landscape) and (min-width: 700px) {
+  #app.hong { --beside: 19rem; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+  #app.hong .hk-table { grid-column: 1; grid-row: 2 / span 2; }
+  #app.hong .hk-hand { grid-column: 1; grid-row: 4; }
+  #app.hong .hk-mine { grid-column: 2; grid-row: 2; flex-wrap: wrap; margin-top: .8rem; }
+  #app.hong .hk-me-rule { margin-left: 0; flex-basis: 100%; text-align: left; }
+  #app.hong .hk-bar { grid-column: 2; grid-row: 3 / span 2; align-content: end; }
+  #app.hong .hk-coach { font-size: .9rem; }
+}
+
+/* A phone on its side is a mahjong table: the cloth takes the whole height on the left, the rivers round the dial and
+   each player at their own edge (hong.js draws it to the height), your tiles along its near edge as if you sat at it.
+   Beside it a console: the header at the top (the logo stands for the name), your seat with the round, the coach, and
+   your move, its buttons lowest, under the thumb. Everything fits; nothing scrolls. */
+@media (orientation: landscape) and (min-width: 700px) and (max-height: 500px) {
+  html #app.hong { --beside-cols: minmax(0, 1fr) 11.5rem; --beside-gap: .7rem; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden;
+    --hk-felt: color-mix(in srgb, #4E8A5E 19%, var(--sheet));                             /* a deeper cloth for the whole screen */
+    padding: max(.45rem, env(safe-area-inset-top, 0px)) max(.6rem, env(safe-area-inset-right, 0px)) max(.45rem, env(safe-area-inset-bottom, 0px)) max(.6rem, env(safe-area-inset-left, 0px)); }
+  @media (prefers-color-scheme: dark) { html:not([data-mode="day"]) #app.hong { --hk-felt: color-mix(in srgb, #2F6E58 26%, var(--sheet)); } }
+  html[data-mode="night"] #app.hong { --hk-felt: color-mix(in srgb, #2F6E58 26%, var(--sheet)); }
+  html #app.hong.beside > .top { grid-column: 2; grid-row: 1; padding-bottom: .45rem; }
+  #app.hong .top .mark-btn { font-size: 0; gap: 0; }
+  #app.hong .top .partner-pill { display: none; }        /* no room to say it here: at the table your partner sits across */
+  #app.hong .top .mark-icon { width: 2.1rem; height: 2.1rem; }
+  #app.hong .top .top-right { gap: .35rem; }
+  #app.hong .top .pick { min-height: 2rem; padding: .2rem .5rem; font-size: .72rem; }
+  #app.hong .top .cx-btn { width: 2.25rem; height: 2.25rem; }
+  #app.hong .top .cx-btn .cx { width: 2.1rem; height: 2.1rem; }
+
+  /* the cloth is the section, all the height; the drawing fills it but for the room your row needs at its foot */
+  #app.hong .hk-table { grid-column: 1; grid-row: 1 / -1; margin: 0; padding: .5rem .55rem; place-items: start center; border-radius: 6px; border: 1px solid var(--tile-edge);
+    background: radial-gradient(ellipse 70% 65% at 50% 45%, color-mix(in srgb, var(--hk-felt) 55%, var(--sheet)), var(--hk-felt));
+    box-shadow: inset 0 0 0 4px var(--hk-felt), inset 0 0 0 5px var(--rule); }
+  #app.hong .hk-board { height: calc(100cqh - var(--hk-reserve, 4.3rem)); background: none; border: 0; border-radius: 0; box-shadow: none; }
+  #app.hong .hk-hand { grid-column: 1; grid-row: 3; align-self: end; justify-content: center; z-index: 1; padding: .55rem .8rem .7rem; }
+
+  /* the console */
+  #app.hong .hk-mine { grid-column: 2; grid-row: 2; flex-wrap: wrap; gap: .2rem .5rem; margin: .45rem 0 .3rem; }
+  #app.hong .hk-me-rule { margin-left: 0; flex-basis: 100%; text-align: left; font-size: .74rem; line-height: 1.3; }
+  #app.hong .hk-bar { grid-column: 2; grid-row: 3; display: flex; flex-direction: column; justify-content: flex-end; gap: .4rem; min-height: 0; padding: 0; }
+  #app.hong .hk-coach { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; font-size: .76rem; line-height: 1.3; }
+  #app.hong .hk-actions { flex: none; gap: .35rem; min-height: 0; }
+  #app.hong .hk-go { flex: 1 1 auto; min-height: 2.5rem; padding: 0 .5rem; font-size: .74rem; }
+  #app.hong .hk-go.chow { flex: 0 1 auto; }
+  #app.hong .hk-wait, #app.hong .hk-claim { font-size: .8rem; }
+  .hk-toast { top: 46%; bottom: auto; left: calc(50% - 6.1rem); max-width: min(56vw, 26rem); }    /* over the cloth's middle, not your tiles */
+
+  /* full screen: the cloth the whole screen, the console lying on it at the right with the header's buttons at its top,
+     and your tiles under both, the whole width */
+  html #app.hong.ontable { grid-template-rows: auto minmax(0, 1fr) auto; }
+  #app.hong.ontable .hk-table { grid-column: 1 / -1; grid-row: 1 / -1; padding: .5rem calc(11.5rem + 1.25rem) .5rem .55rem;
+    background: radial-gradient(ellipse 70% 65% at 40% 45%, color-mix(in srgb, var(--hk-felt) 55%, var(--sheet)), var(--hk-felt)); }
+  #app.hong.ontable .hk-table > .top { top: .45rem; right: .6rem; }
+  #app.hong.ontable .hk-mine { grid-column: 2; grid-row: 1; z-index: 1; margin-top: 3.05rem; padding-right: .6rem; }
+  #app.hong.ontable .hk-bar { grid-column: 2; grid-row: 2; z-index: 1; padding: 0 .6rem .45rem 0; }
+  #app.hong.ontable .hk-hand { grid-column: 1 / -1; grid-row: 3; }
+}

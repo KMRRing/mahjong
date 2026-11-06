@@ -1,0 +1,278 @@
+/* Office, the one theme beyond Codex (whose look is the stylesheets themselves). Loaded last on every page.
+   Office is night only: theme.js sets data-theme="office" and data-mode="night" on <html> before the page draws, whatever
+   the phone says. It starts from the undecorated base below (each selector Codex's Art Deco dress restyled, as it was
+   before) and dresses it as Microsoft Office does, after Outlook: Fluent's neutrals and its blue, Segoe UI in sentence
+   case, hairline borders, small rounded corners, no ornaments. */
+
+/* ---------- the undecorated base: each selector Codex dressed, as it was before ---------- */
+html[data-theme="office"] .bl-about { border-radius: 999px; }
+html[data-theme="office"] .bl-margin { border-radius: 16px; box-shadow: none; }
+html[data-theme="office"] .bl-margin-row span { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .bl-go { border-radius: 14px; background: var(--bl-in); color: #fff; font-size: 1.02rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .bl-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; }
+html[data-theme="office"] .bl-chip { border-radius: 999px; }
+html[data-theme="office"] .bl-spec { border-radius: 12px; }
+html[data-theme="office"] .bl-row { border-radius: 12px; }
+html[data-theme="office"] .bl-row .name .bio { border-radius: 999px; font-size: .7rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; }
+html[data-theme="office"] .bl-toast { border-radius: 10px; }
+html[data-theme="office"] .ct-table { border-radius: 26px; outline: none; outline-offset: 0; }
+html[data-theme="office"] .ct-seat { border-radius: 16px; }
+html[data-theme="office"] .ct-seat.targetable.picked::after { border-radius: 999px; background: #E76F51; letter-spacing: .04em; text-transform: uppercase; }
+html[data-theme="office"] .ct-marker { border-radius: 999px; }
+html[data-theme="office"] .ct-notes li { border-radius: 999px; border: 1px solid rgba(255, 255, 255, .22); }
+html[data-theme="office"] .ct-tray { border-radius: 18px; box-shadow: 0 1px 0 rgba(0, 0, 0, .04); }
+html[data-theme="office"] .ct-chip { border-radius: 999px; }
+html[data-theme="office"] .ct-chip small { text-transform: uppercase; letter-spacing: .04em; }
+html[data-theme="office"] .ct-action { border-radius: 14px; }
+html[data-theme="office"] .ct-panel { border-radius: 14px; }
+html[data-theme="office"] .ct-label { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .ct-choice { border-radius: 12px; }
+html[data-theme="office"] .ct-role { border-radius: 12px; }
+html[data-theme="office"] .ct-step-btn { border-radius: 12px; }
+html[data-theme="office"] .ct-go { border-radius: 14px; background: var(--ct-ox-fill); color: #fff; text-transform: none; letter-spacing: normal; font-stretch: 100%; outline: none; outline-offset: 0; }
+html[data-theme="office"] .ct-row .btn[aria-pressed="true"] { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] dialog.ct-pop { border: 0; border-radius: 18px; }
+html[data-theme="office"] .ch-card { border-radius: 20px; box-shadow: none; }
+html[data-theme="office"] .ch-cat { border-radius: 999px; font-size: .72rem; font-stretch: 100%; text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .ch-map { border-radius: 12px; }
+html[data-theme="office"] .ch-go { border-radius: 14px; background: var(--ch-in); color: #fff; font-size: 1.02rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .ch-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; font-stretch: 100%; letter-spacing: normal; }
+html[data-theme="office"] .ch-stats div { border-radius: 12px; }
+html[data-theme="office"] .ch-summary { border-radius: 12px; }
+html[data-theme="office"] .ch-toast { border-radius: 10px; }
+html[data-theme="office"] .dk-piles div { border-radius: 12px; }
+html[data-theme="office"] .dk-go { border-radius: 14px; background: var(--dk-in); color: #fff; font-size: 1.05rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .dk-option { border-radius: 12px; }
+html[data-theme="office"] .dk-number input { border-radius: 12px; }
+html[data-theme="office"] .dk-number button { border-radius: 12px; }
+html[data-theme="office"] .dk-summary { border-radius: 16px; box-shadow: none; }
+html[data-theme="office"] .dk-toast { border-radius: 10px; }
+html[data-theme="office"] .dk-speak { border: 1.5px solid var(--ink-soft); }
+html[data-theme="office"] .d-num { font-stretch: 112%; }
+html[data-theme="office"] .dd { border-radius: 6px; }
+html[data-theme="office"] .dd-list { border: 1px solid var(--tile-edge); border-radius: 12px; }
+html[data-theme="office"] .dd-opt { border-radius: 8px; }
+html[data-theme="office"] .dd-opt.on { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+html[data-theme="office"] .dd-opt:active { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+html[data-theme="office"] .hb-ctl { border: 1.5px solid var(--ink); border-radius: 999px; }
+html[data-theme="office"] .hb-ctl.primary { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .hb-picktool[aria-pressed="true"] { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .hb-cell.lp-badge { border-radius: 999px; }
+html[data-theme="office"] .hb-bests thead th { letter-spacing: .05em; text-transform: uppercase; }
+html[data-theme="office"] .mf-stage { border-radius: 20px; box-shadow: none; }
+html[data-theme="office"] .mf-order { border-radius: 12px; }
+html[data-theme="office"] .mf-order b { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .mf-book.strip .mf-chiplet { border-radius: 999px; }
+html[data-theme="office"] .mf-row { border-radius: 14px; }
+html[data-theme="office"] .mf-chip { border-radius: 12px; }
+html[data-theme="office"] .mf-mini button { border-radius: 12px; }
+html[data-theme="office"] .mf-go { border-radius: 14px; background: var(--mf-in); color: #fff; font-size: 1.05rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .mf-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; }
+html[data-theme="office"] .mf-stats div { border-radius: 12px; }
+html[data-theme="office"] .mf-toast { border-radius: 10px; }
+html[data-theme="office"] .pa-stats div { border-radius: 12px; }
+html[data-theme="office"] .pa-go { border-radius: 14px; background: var(--pa-in); color: #fff; font-size: 1.05rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .pa-unit { border-radius: 12px; }
+html[data-theme="office"] .pa-card { border-radius: 16px; box-shadow: none; }
+html[data-theme="office"] .pa-option { border-radius: 12px; }
+html[data-theme="office"] .pa-type input { border-radius: 12px; }
+html[data-theme="office"] .pa-type button { border-radius: 12px; }
+html[data-theme="office"] .pa-toast { border-radius: 10px; }
+html[data-theme="office"] .pi-stage { border-radius: 20px; box-shadow: none; }
+html[data-theme="office"] .pi-board { border-radius: 14px; }
+html[data-theme="office"] .pi-go { border-radius: 14px; background: var(--pi-in); color: #fff; font-size: 1.02rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .pi-go.quiet { background: var(--yard); box-shadow: none; outline: none; }
+html[data-theme="office"] .pi-stats div { border-radius: 12px; }
+html[data-theme="office"] .pi-toast { border-radius: 10px; }
+html[data-theme="office"] .pt-lengths .btn[aria-pressed="true"] { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .pt-pot b { font-stretch: 112%; }
+html[data-theme="office"] .pt-chips .btn[aria-pressed="true"] { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .pt-picture img { border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.18); filter: none; }
+html[data-theme="office"] .pt-reasons .btn[aria-checked="true"] { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .qt-card { border-radius: 20px; box-shadow: none; }
+html[data-theme="office"] .qt-cat { border-radius: 999px; font-size: .72rem; font-stretch: 100%; text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .qt-side span { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .qt-side input { border-radius: 12px; }
+html[data-theme="office"] .qt-go { border-radius: 14px; background: var(--qt-in); color: #fff; font-size: 1.05rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .qt-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; }
+html[data-theme="office"] .qt-stats div { border-radius: 12px; }
+html[data-theme="office"] .qt-toast { border-radius: 10px; }
+html[data-theme="office"] .rf-about { border-radius: 999px; border: 1.5px solid var(--rf-edge, #C9D1D5); }
+html[data-theme="office"] .rf-margin { border-radius: 16px; box-shadow: none; }
+html[data-theme="office"] .rf-margin-row span { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .rf-go { border-radius: 14px; background: var(--rf-in); color: #fff; font-size: 1.02rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .rf-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; }
+html[data-theme="office"] .rf-tabs { border-radius: 12px; }
+html[data-theme="office"] .rf-pane { border-radius: 12px; }
+html[data-theme="office"] .rf-chip { border-radius: 999px; }
+html[data-theme="office"] .rf-group { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .rf-stream { border-radius: 12px; }
+html[data-theme="office"] .rf-pool { border-radius: 12px; }
+html[data-theme="office"] .rf-pick button { border-radius: 12px; }
+html[data-theme="office"] .rf-pick .head { text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .rf-toast { border-radius: 10px; }
+html[data-theme="office"] .ch-board .sq.light { fill: #E4ECF3; }
+html[data-theme="office"] .ch-board .sq.dark { fill: #6B8DB0; }
+html[data-theme="office"] .ch-board .coord.on-light { fill: #6B8DB0; }
+html[data-theme="office"] .ch-board .coord.on-dark { fill: #E4ECF3; }
+html[data-theme="office"] .ru-stats div { border-radius: 12px; }
+/* Stow without Codex's wood: the cargo a neutral grey, the stamp in the theme's own accent */
+html[data-theme="office"] { --sw-cell: color-mix(in srgb, var(--ink) 7%, var(--sheet)); --sw-cargo: color-mix(in srgb, var(--ink) 30%, var(--sheet)); --sw-stamp: var(--sw-in); --sw-stamp-edge: var(--sheet); }
+html[data-theme="office"] .sw-board { border-radius: 20px; box-shadow: none; }
+html[data-theme="office"] .sw-slot { border-radius: 12px; }
+html[data-theme="office"] .sw-go { border-radius: 14px; background: var(--sw-in); color: #fff; font-size: 1.02rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .sw-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; }
+html[data-theme="office"] .sw-row button { border-radius: 10px; }
+html[data-theme="office"] .sw-chapter, html[data-theme="office"] .sw-strip #where { font-stretch: 100%; text-transform: uppercase; letter-spacing: .06em; }
+html[data-theme="office"] .sw-toast { border-radius: 10px; }
+html[data-theme="office"] .g-actions .btn { letter-spacing: normal; }
+html[data-theme="office"] .g-krow button.place { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .g-defs .pos { text-transform: uppercase; letter-spacing: .05em; }
+html[data-theme="office"] .sp-mod { border-radius: 999px; }
+html[data-theme="office"] .sp-mod small { text-transform: uppercase; letter-spacing: .05em; }
+html[data-theme="office"] .sp-sum em { border-radius: 999px; }
+html[data-theme="office"] .sp-field { border-radius: 20px; }
+html[data-theme="office"] .sp-sum { border-radius: 14px; }
+html[data-theme="office"] .sp-token { border-radius: 18px; }
+html[data-theme="office"] .sp-overlay { border-radius: 20px; background: rgba(20, 27, 32, .55); }
+html[data-theme="office"] .sp-card { border-radius: 22px; }
+html[data-theme="office"] .sp-stats div { border-radius: 12px; }
+html[data-theme="office"] .sp-go { border-radius: 16px; background: var(--sp-or); color: #fff; text-transform: none; letter-spacing: normal; font-stretch: 100%; outline: none; outline-offset: 0; }
+html[data-theme="office"] .sp-go.quiet { background: var(--yard); color: var(--ink); box-shadow: none; outline: none; }
+html[data-theme="office"] .sp-toast { border-radius: 10px; }
+html[data-theme="office"] .top { background: none; }
+html[data-theme="office"] .mark { font-size: 1.75rem; font-stretch: 100%; letter-spacing: -.02em; text-transform: none; }
+html[data-theme="office"] .mark-btn { text-transform: none; }
+html[data-theme="office"] dialog.apps .pick-head h2 { font-size: 1.75rem; font-stretch: 100%; letter-spacing: -.02em; text-transform: none; }
+html[data-theme="office"] .app-row { border-radius: 14px; border: 2px solid transparent; outline: none; outline-offset: 0; }
+html[data-theme="office"] .app-name { font-size: clamp(.82rem, 17cqh, 1.1rem); font-stretch: 100%; letter-spacing: normal; text-transform: none; }
+html[data-theme="office"] .app-now { font-size: .68rem; font-weight: 750; letter-spacing: normal; text-transform: none; border-radius: 999px; background: var(--ink); color: var(--yard); }
+html[data-theme="office"] dialog.apps-pop { border: 0; border-radius: 18px; }
+html[data-theme="office"] dialog.apps-pop .pick-head h2 { font-size: 1.3rem; }
+html[data-theme="office"] .pool { border-radius: 6px; background-color: var(--ink); color: var(--yard); }
+html[data-theme="office"] .pick { border: 1.5px solid var(--ink-soft); border-radius: 6px; font-weight: 600; font-stretch: 100%; letter-spacing: normal; text-transform: none; }
+html[data-theme="office"] .tile { border: 2px solid var(--tile-edge); border-radius: 10px; }
+html[data-theme="office"] .tile[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); background: color-mix(in srgb, var(--ink) 7%, var(--tile)); }
+html[data-theme="office"] .cell.psel .tile { border-color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); background: color-mix(in srgb, var(--ink) 7%, var(--tile)); }
+html[data-theme="office"] .crate { border-radius: 10px; }
+html[data-theme="office"] .crate-name { font-size: 1.3rem; font-stretch: 100%; letter-spacing: -.01em; text-transform: none; }
+html[data-theme="office"] .btn { border: 1.5px solid var(--ink); border-radius: 999px; font-weight: 650; font-stretch: 100%; letter-spacing: normal; text-transform: none; }
+html[data-theme="office"] .btn.primary { background: var(--ink); color: var(--yard); outline: none; outline-offset: 0; }
+html[data-theme="office"] .sheet .join-run input { border: 1.5px solid var(--ink-soft); border-radius: 999px; }
+html[data-theme="office"] .sheet h4 { font-size: .8rem; font-weight: 700; font-stretch: 100%; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+html[data-theme="office"] .seg { border: 1.5px solid var(--ink); border-radius: 6px; }
+html[data-theme="office"] .seg button { border-left: 1.5px solid var(--ink); }
+html[data-theme="office"] .seg button[aria-checked="true"] { background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .chip { border: 1.5px solid var(--ink-soft); }
+html[data-theme="office"] .chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--yard); }
+html[data-theme="office"] .sheet input { border: 1.5px solid var(--ink); border-radius: 6px; }
+html[data-theme="office"] .pick-head h2 { font-size: 1.4rem; font-stretch: 100%; letter-spacing: -.01em; text-transform: none; }
+html[data-theme="office"] .code-chip { border-radius: 999px; }
+html[data-theme="office"] .code-chip em.on { color: #3a9d57; }
+html[data-theme="office"] .partner-pill { font-size: .62rem; letter-spacing: normal; }
+html[data-theme="office"] .partner-line.on { color: #3a9d57; }
+html[data-theme="office"] .icon-btn { border: 1.5px solid var(--tile-edge); }
+html[data-theme="office"] dialog.menu-sheet { border-radius: 18px 18px 0 0; }
+html[data-theme="office"] dialog.menu-sheet .pick-head h2 { font-size: 1.15rem; }
+html[data-theme="office"] .menu-h { font-size: .72rem; font-stretch: 100%; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+html[data-theme="office"] .sv-card { border-radius: 20px; box-shadow: none; }
+html[data-theme="office"] .sv-tool { border-radius: 12px; }
+html[data-theme="office"] .sv-go { border-radius: 14px; background: var(--sv-in); color: #fff; font-size: 1.02rem; font-stretch: 100%; letter-spacing: normal; text-transform: none; outline: none; outline-offset: 0; }
+html[data-theme="office"] .sv-toast { border-radius: 10px; }
+
+/* Office's line icons and menu button (apps.js, menu.js): line drawings, one stroke */
+.k-ico { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; color: var(--ink); }
+.k-ico .a { stroke: var(--brass); }
+.k-ico .f { fill: var(--brass); stroke: none; }
+.k-menu { width: 1.625rem; height: 1.625rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: square; }
+html[data-theme="office"] :is(.btn.primary, [class*="-go"]) { outline: 0; }
+
+/* ---------- Office: after Outlook and Microsoft's Fluent design. Charcoal surfaces, night only; one blue for what can be pressed; Segoe UI in sentence case; hairlines; 4 px corners; no ornaments, no
+   marks: the games screen shows names and thin monochrome line icons. ---------- */
+html[data-theme="office"] {
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --yard: #1F1F1F; --ink: #FFFFFF; --ink-soft: #ADADAD; --tile: #292929; --tile-edge: #474747; --sheet: #292929;
+  --c0: #E9C46A; --c1: #54B054; --c2: #479EF5; --c3: #F1707B; --on-c: #141414; --on-c0: #141414;
+  --brass: #479EF5; --brass-hi: #0A1A2B; --brass-lo: #62ABF5; --rule: #3D3D3D; --plate: #115EA3; --plate-ink: #FFFFFF;
+  --focus: #62ABF5; --p0: #479EF5; --p1: #E085D8; --learn: #54B054; --logo-edge: #FFFFFF;
+  --caps: none; --track: 0; --stretch-btn: 100%; --wide: 100%;
+  --of-hover: #333333; --of-selected: #0E2A47; --of-shadow: 0 2px 4px rgba(0, 0, 0, .5), 0 0 2px rgba(0, 0, 0, .4);
+}
+
+/* lettering: Segoe UI, 14 px, sentence case everywhere; headings semibold, never tracked or stretched */
+html[data-theme="office"] body { font-family: var(--font); font-size: .875rem; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+html[data-theme="office"] :is(h1, h2, h3, h4, .btn, .pick, .menu-h, .pick-head h2, .app-name, .sheet h4, .menu-label, [class*="-go"], .menu-seg button, .mark, .mark-btn,
+  [class*="-label"], [class*="-tag"], [class*="-cat"], [class*="-chip"], [class*="-note"] b, .apps-brand) {
+  font-family: var(--font); text-transform: none; letter-spacing: normal; font-stretch: 100%; }
+html[data-theme="office"] :is(h1, h2, h3, .pick-head h2, .mark, .mark-btn) { font-weight: 600; }
+html[data-theme="office"] :is(.menu-h, .sheet h4, .menu-label) { font-weight: 600; font-size: .86rem; color: var(--ink); }
+
+/* the frame: a plain header (the name, a hairline under it), no marks or ornaments */
+html[data-theme="office"] :is(.mark, .mark-btn) { font-size: 1rem; font-weight: 600; }
+html[data-theme="office"] .mark img, html[data-theme="office"] .mark svg:not(.k-ico) { display: none; }
+html[data-theme="office"] .top, html[data-theme="office"] .apps-brand { background: none; border-bottom: 1px solid var(--rule); }
+html[data-theme="office"] .apps-brand { font-size: 1.25rem; font-weight: 600; text-transform: none; letter-spacing: normal; }
+html[data-theme="office"] .apps-brand :is(img, svg) { display: none; }
+
+/* controls: Fluent's buttons (white with a hairline; the primary in blue), 4 px corners, a quiet hover, a blue focus ring */
+html[data-theme="office"] :is(.btn, .pick, .tile, .app-row, .menu-seg, .menu-grid button, .menu-switch, .code-chip, .icon-btn, input, select, [class*="-go"]) { border-radius: 4px; }
+html[data-theme="office"] :is(.btn, .pick, .tile, .app-row, .code-chip, .icon-btn) { border-width: 1px; box-shadow: none; }
+html[data-theme="office"] :is(.btn, .pick, [class*="-go"]) { font-weight: 600; font-size: .9rem; }
+html[data-theme="office"] :is(.btn, .pick, [class*="-go"].quiet) { background: var(--sheet); color: var(--ink); border: 1px solid var(--tile-edge); box-shadow: none; outline: 0; }
+html[data-theme="office"] :is(.btn.primary, [class*="-go"]:not(.quiet)) { background: var(--plate); color: var(--plate-ink); border: 1px solid var(--plate); box-shadow: none; outline: 0; }
+html[data-theme="office"] :is(.btn, .pick, .app-row, .icon-btn, .menu-grid button):hover { background: var(--of-hover); }
+html[data-theme="office"] :is(.btn.primary, [class*="-go"]:not(.quiet)):hover { background: color-mix(in srgb, var(--plate) 88%, #000); }
+html[data-theme="office"] :focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+html[data-theme="office"] .menu-switch::after { border-radius: 999px; }
+html[data-theme="office"] .menu-switch { border-radius: 999px; }
+
+/* surfaces: dialogs and sheets as Fluent's (8 px corners, a soft shadow, no ornament) */
+html[data-theme="office"] :is(dialog.sheet, dialog.menu-sheet, dialog.apps-pop) { border-radius: 8px; border: 1px solid var(--tile-edge); box-shadow: var(--of-shadow); background: var(--sheet); }
+html[data-theme="office"] ::backdrop { background: rgba(0, 0, 0, .4); }
+
+/* the games screen: a list of names with thin line icons, the one you're in marked as selected */
+html[data-theme="office"] .app-row { background: var(--sheet); }
+html[data-theme="office"] .app-row.cur { background: var(--of-selected); border-color: var(--brass); }
+html[data-theme="office"] .app-name { font-weight: 600; }
+
+/* the line icons, Office's way: thin, rounded, one colour, the accent in blue */
+html[data-theme="office"] .k-ico { stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; color: var(--ink); }
+html[data-theme="office"] .k-ico .a { stroke: var(--brass); }
+html[data-theme="office"] .k-ico .f { fill: var(--brass); }
+html[data-theme="office"] .k-menu { stroke-width: 1.6; stroke-linecap: round; color: var(--ink); }
+
+/* Cartel: the felt becomes a plain dark panel, Office's charcoal with a blue hairline (its writing is light, by design) */
+html[data-theme="office"] { --ct-gold: #479EF5; --ct-gold-edge: #115EA3; }
+html[data-theme="office"] .ct-table { border: 1px solid #3D3D3D; border-radius: 8px; outline: 0; box-shadow: none; color: #FFFFFF; background: #1F1F1F; }
+html[data-theme="office"] .ct-seat { border-radius: 4px; border-width: 1px; background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .14); }
+html[data-theme="office"] .ct-seat.turn { border-color: #479EF5; box-shadow: 0 0 0 2px rgba(71, 158, 245, .3); }
+html[data-theme="office"] :is(.ct-log-line.ask, .ct-log-line.answer, .ct-mine-ask, .ct-mine.turn .ct-plaque b) { color: #62ABF5; }
+html[data-theme="office"] :is(.ct-log-line.act, .ct-log-line.free, .ct-log-line.bid) { color: #FFFFFF; }
+html[data-theme="office"] .ct-die.picked { outline-color: #479EF5; border-radius: 4px; }
+html[data-theme="office"] .ct-notes li { border-color: rgba(71, 158, 245, .4); color: #FFFFFF; border-radius: 4px; }
+
+/* Gears (Pipes until 4 November): charcoal tiles and grey gears; the flow's inlet and a good run in blue */
+html[data-theme="office"] { --sw-in: #479EF5; }
+html[data-theme="office"] { --pi-in: #479EF5; --pi-in-soft: #0E2A47; --pi-ground: #141414; --pi-tile: #292929; --pi-tile-edge: #3D3D3D;
+  --pi-pipe: #ADADAD; --pi-pipe-dark: #707070; --pi-rock: #0A0A0A; --pi-good: #54B054; --pi-bad: #F1707B; --pi-edge: var(--tile-edge); }
+/* Harbour: a deep navy chart with flat grey land */
+html[data-theme="office"] .harbour { --hb-water: #163454; --hb-grid: rgba(71, 158, 245, .14); --hb-land: #2E2E2E; --hb-hull: #E0E0E0; --hb-ship-ink: #242424; }
+html[data-theme="office"] :is(.pi-stage, .pi-board, .pi-go, .pi-stats div, .hb-map, .hb-cell, .hb-tool, .hb-ctl, .hb-tag) { border-radius: 4px; }
+html[data-theme="office"] .pi-board rect[rx="8"] { rx: 3px; }
+/* chess: Office's own board, grey and blue-grey */
+html[data-theme="office"] .ch-board .sq.light { fill: #D6D6D6; }
+html[data-theme="office"] .ch-board .sq.dark { fill: #5A7894; }
+html[data-theme="office"] .ch-board .coord.on-light { fill: #4F6E8F; }
+html[data-theme="office"] .ch-board .coord.on-dark { fill: #CBD6E0; }
+/* choices as Fluent marks them: the selected option in blue, a switch that's on in blue */
+html[data-theme="office"] .menu-seg button[aria-checked="true"],
+html[data-theme="office"] .menu-grid button:is([aria-checked="true"], [aria-pressed="true"]) { background: var(--plate); color: var(--plate-ink); border-color: var(--plate); }
+html[data-theme="office"] .menu-switch[aria-checked="true"] { background: var(--plate); }
+html[data-theme="office"] .menu-switch[aria-checked="true"]::after { background: #FFFFFF; }
+
+/* random mode (style.css, random.js): the banner naming the next game, and the tag in a game's title, in Office's Fluent card */
+html[data-theme="office"] .rd-next { border-radius: 8px; border: 1px solid var(--tile-edge); box-shadow: var(--of-shadow); }
+html[data-theme="office"] .rd-chip { border-radius: 4px; }
+
+/* a titled page's name in the band (style.css, "Titled"): Office's lettering, at the band's size */
+html[data-theme="office"] #app.full.titled > .top > .mark { font-size: 1.05rem; font-weight: 600; font-stretch: 100%; letter-spacing: 0; text-transform: none; }
