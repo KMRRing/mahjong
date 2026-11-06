@@ -200,6 +200,14 @@ export function createTable3d(c) {
   document.body.insertAdjacentHTML("beforeend", `<div class="hk3-fx" id="hk3fx" aria-hidden="true"></div>`);
   const hudEl = $("hk3hud"), field = $("hk3field"), plane = $("hk3plane"), world = $("hk3world"), centreEl = $("hk3centre"), fx = $("hk3fx"), lookEl = $("hk3look"), bannerEl = $("hk3banner");
   let geo = null, geoKey = "", seen = null, snap = null, jump = false, reading = null;
+  // the third view (hong-gl.js) is loaded when first chosen: three.js is large and the other two views don't need it
+  let gl = null, glLoading = false;
+  const glOn = () => !!c.gl?.();
+  function needGL() {
+    if (gl || glLoading) return;
+    glLoading = true;
+    import("./hong-gl.js").then(m => { gl = m.createGL({ host: field }); draw(); }, e => { console.error(e); glLoading = false; c.glFailed?.(); });
+  }
   const flying = new Set();
 
   /** An element's contents, set only when they change (what runs on it, a pulse, doesn't restart). */
@@ -239,16 +247,16 @@ export function createTable3d(c) {
     const start = wallStart(rel(G.dealer, me), g.nTop, g.nSide), head = Math.floor(G.head / 2), tail = Math.floor((G.tail - 1) / 2);
     for (let i = 0; i < n; i++) {
       const r = g.stacks[(start + i) % n], left = stackLeft(i, G.head, G.tail);
-      out.push({ key: `w${i}`, tag: "div", cls: `hk3-w s${r.side} n${left}${left && i === head ? " head" : ""}${left && i === tail ? " tail" : ""}`, ...r, x: r.x, y: r.y });
+      out.push({ g3: { kind: "wall", side: r.side, n: left, head: !!(left && i === head), tail: !!(left && i === tail) }, key: `w${i}`, tag: "div", cls: `hk3-w s${r.side} n${left}${left && i === head ? " head" : ""}${left && i === tail ? " tail" : ""}`, ...r, x: r.x, y: r.y });
     }
     // the pools: a frame for each, lit while its player is to move, and the discards
     const turn = G.phase === "act" ? G.turn : -1;
     for (let r = 0; r < 4; r++) {
       const seat = (me + r) % 4, q = g.pools[r];
-      out.push({ key: `p${r}`, tag: "div", cls: `hk3-pool r${r}${seat === turn ? " on" : ""}`, x: q.x - 0.25 * d, y: q.y - 0.2 * d, w: q.w + 0.45 * d, h: q.h + 0.4 * d });
+      out.push({ g3: { kind: "pool", on: seat === turn }, key: `p${r}`, tag: "div", cls: `hk3-pool r${r}${seat === turn ? " on" : ""}`, x: q.x - 0.25 * d, y: q.y - 0.2 * d, w: q.w + 0.45 * d, h: q.h + 0.4 * d });
       riverOf(G, seat).forEach((t, i) => {
         const { x, y } = q.slot(i);
-        out.push({ key: `d${seat}:${t.raw}`, tag: "button", cls: `hk3-t d${t.last ? " last" : ""}${t.last && offer ? " offer" : ""}`, x, y, w: d, h: d * SR, html: slabSvg(t.k),
+        out.push({ g3: { kind: "disc", k: t.k, last: !!t.last, offer: !!(t.last && offer) }, key: `d${seat}:${t.raw}`, tag: "button", cls: `hk3-t d${t.last ? " last" : ""}${t.last && offer ? " offer" : ""}`, x, y, w: d, h: d * SR, html: slabSvg(t.k),
           attrs: { "data-read": t.k, "data-ctx": `${c.nameOf(seat)}’s discard`, "aria-label": `${E.tileName(t.k)}, ${c.nameOf(seat)}’s discard` } });
       });
     }
@@ -257,7 +265,7 @@ export function createTable3d(c) {
       const seat = (me + r) % 4, strip = g.strips[r];
       for (const it of stripItems(strip, r, g.t, infoOf(G, seat))) {
         const read = it.k >= 0;
-        out.push({ key: `s${seat}:${it.key}`, tag: read ? "button" : "div", cls: `hk3-t ${it.k < 0 ? "hidden" : "up"}${it.small ? " small" : ""}${it.won ? " won" : ""}`, x: it.cx - it.w / 2, y: it.cy - it.h / 2, w: it.w, h: it.h, rot: it.rot, html: slabSvg(it.k),
+        out.push({ g3: { kind: "strip", k: it.k, rel: r, part: it.key[0], small: !!it.small, won: !!it.won }, key: `s${seat}:${it.key}`, tag: read ? "button" : "div", cls: `hk3-t ${it.k < 0 ? "hidden" : "up"}${it.small ? " small" : ""}${it.won ? " won" : ""}`, x: it.cx - it.w / 2, y: it.cy - it.h / 2, w: it.w, h: it.h, rot: it.rot, html: slabSvg(it.k),
           attrs: read ? { "data-read": it.k, "data-ctx": `${c.nameOf(seat)}’s ${it.key[0] === "f" ? "flower" : it.key[0] === "m" ? "set" : "hand"}`, "aria-label": `${E.tileName(it.k)}, ${c.nameOf(seat)}’s ${it.key[0] === "f" ? "flower" : it.key[0] === "m" ? "set" : "tile"}` } : {} });
       }
     }
@@ -358,10 +366,33 @@ export function createTable3d(c) {
       plane.style.setProperty("--d", `${geo.d.toFixed(2)}px`);
     }
     if (jump) { plane.classList.add("jump"); requestAnimationFrame(() => requestAnimationFrame(() => plane.classList.remove("jump"))); jump = false; }
+    field.classList.toggle("gl", glOn());
+    if (glOn()) {
+      centre(G, me);
+      if (!drawGL(G, me, fw, fh, hp)) { field.classList.remove("gl"); c.glFailed?.(); }
+      banner(G, me);
+      return;
+    }
+    gl?.show(false);
     sync(world, items(G, me));
     centre(G, me);
     banner(G, me);
     if (reading && !world.querySelector(`[data-read="${reading.k}"]`)) unread();
+  }
+
+  /** The same items, stood up in the scene (hong-gl.js): hidden tiles stay backs whatever they are. */
+  function drawGL(G, me, fw, fh, hp) {
+    needGL();
+    if (!gl) return true;
+    if (gl.failed) return false;
+    gl.show(true);
+    const p = geo.plate, turn = G.phase === "act" ? G.turn : c.busy() ?? -1, offer = answering(G) ? claim(G) : null;
+    const badges = [0, 1, 2, 3].map(r => { const seat = (me + r) % 4, w = E.windOf(G, seat); return { w: E.WINDS[w], dealer: w === 0, on: seat === turn }; });
+    const ok = gl.set({
+      items: items(G, me), d: geo.d, plane: { w: fw, h: hp }, box: { w: fw, h: fh }, jump: plane.classList.contains("jump"),
+      plate: p, centre: { badges, round: E.WINDS[G.round], left: E.wallLeft(G), offer: offer ? { tile: E.tileName(offer.k), who: c.nameOf(offer.seat), how: G.phase === "rob" ? "adds to a kong" : "lets go" } : null },
+    });
+    return ok;
   }
 
   // ---------- motion: what moved since the last draw, flown from where it was ----------
@@ -444,5 +475,5 @@ export function createTable3d(c) {
   }
 
   // the page turned or resized: drawn again by hong.js; a view shown again after the table view has moves it didn't see (none are flown)
-  return { draw, snapshot, fly, pause, empty, reset: () => { seen = null; snap = null; geoKey = ""; unread(); } };
+  return { draw, snapshot, fly, pause: on => { pause(on); gl?.pause(on); }, empty, resetView: () => gl?.resetView(), reset: () => { seen = null; snap = null; geoKey = ""; unread(); gl?.show(glOn()); } };
 }

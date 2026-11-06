@@ -104,3 +104,5 @@ export const tileSvg = (k, cls = "", slab = false) => `<svg class="hk-t${slab ? 
 /** A slab for the 3D table's own elements (they carry their own labels). */
 export const slabSvg = k => `<svg class="hk3-s" viewBox="0 0 ${W} ${SLAB}" aria-hidden="true"><use href="#hk3-${k < 0 ? "back" : k}"/></svg>`;
 export const TILE_W = W, TILE_H = H, SLAB_H = SLAB;
+/** A tile's face as SVG markup in its 30 x 40 box (colours are the page's variables: hong-gl.js fills them in for a texture). */
+export const faceMarkup = face;

@@ -45,7 +45,7 @@ let opts = { flowers: true, minFan: 3, rounds: 1, scoring: "fan", coach: "on", p
 // (G.opts, in the run). The computer's strength is the hidden ramp (below); the old saved choice is its first step.
 const OLD_BOTS = opts.bots;
 Object.assign(opts, { flowers: true, minFan: 3, rounds: 1, scoring: "fan", pace: "steady", numbers: true, rows: "one", full: false });
-const VIEWS = [["flat", "Table"], ["3d", "3D"]];                   // the table drawn flat (hong.js) or seen at an angle (hong-3d.js)
+const VIEWS = [["flat", "Table"], ["3d", "Angled"], ["gl", "3D"]];       // the table drawn flat (hong.js), seen at an angle (hong-3d.js, CSS), or a real 3D scene (hong-gl.js)
 // opts.view is kept only when the player chose (else the suite's default, mode3d.js); "table" was the old default written into every save
 if (!VIEWS.some(([k]) => k === opts.view)) delete opts.view;
 // the coach was on or off (with Hint) until October 2026, and "differ" for a day: kept as the way it means now
@@ -64,8 +64,8 @@ const keyNow = () => (G ? `${G.hand}:${G.log.length}:${G.phase}` : "");
 const low = () => matchMedia(`${SIDEWAYS} and (max-height: 500px)`).matches;
 /** The view chosen in the menu: the table drawn flat (#board, below) or seen at an angle (#board3d, hong-3d.js). The tiles
  *  in your hand, your seat's line, the coach and the buttons are the same elements in both, drawn here. */
-const in3d = () => wants3D(opts.view, "3d") && !!table3d;
-const viewNow = () => (wants3D(opts.view, "3d") ? "3d" : "flat");
+const in3d = () => viewNow() !== "flat" && !!table3d;
+const viewNow = () => (opts.view === "gl" && !IN_FRAME ? "gl" : wants3D(opts.view === "gl" ? "" : opts.view, "3d") ? "3d" : "flat");
 let table3d = null;
 /** The ratio of a tile in your hand's height to its width: the 3D view's slabs are thicker (hong-tiles.js). */
 const tileRatio = () => (in3d() ? SLAB_H / TILE_W : 4 / 3);
@@ -1222,6 +1222,7 @@ function openMenu() {
   part(body, "play").append(action(cp.done ? `Learn: ${cp.done} of ${cp.of} lessons done` : "Learn Mahjong, from the rules", () => course.open()));
   part(body, "settings").append(
     choice("View", VIEWS, viewNow(), v => set("view", v)),
+    ...(viewNow() === "gl" ? [action("Reset camera", () => table3d.resetView())] : []),
     toggle("Coach", opts.coach !== "off", v => { set("coach", v ? "on" : "off"); if (v) askCoach(); }),
   );
   const st = read(STATS, null), best = read(BEST, null), bestNoFan = read(BEST_NOFAN, null);
@@ -1462,6 +1463,7 @@ const course = createCourse({
 installTiles();
 table3d = createTable3d({
   state: () => G, me: () => me, nameOf, meldTiles, busy: () => busyWith, quiet: IN_FRAME,
+  gl: () => viewNow() === "gl", glFailed: () => { opts.view = "3d"; write(OPTS, opts); applyLook(); toast("3D needs WebGL, which this device doesn't have; showing the angled table."); },
   cap: () => Math.min(handSize([]).tw, 2.4 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16)),
   headerOver, answering: () => !!G && E.legal(G, me).some(a => a.t !== "pass"),
   hand: () => [...$("hand").querySelectorAll(".hk-tile")], melds: () => [...$("hand").querySelectorAll(".hk-meld")],

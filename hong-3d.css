@@ -164,3 +164,7 @@ html[data-theme="office"] .hk3-pool { border-color: color-mix(in srgb, #FFF 12%,
   .hk3-t.offer, .hk3-offer { animation: none; }
   .hk3-plane .hk3-world > :is(.hk3-t, .hk3-w) { transition: none; }
 }
+
+/* the third view (hong-gl.js): the scene fills the field under the plates, the banner and the tile read */
+.hk3-gl { position: absolute; inset: 0; z-index: 0; touch-action: none; display: block; }
+.hk3-field.gl .hk3-stage { visibility: hidden; }
