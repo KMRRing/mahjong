@@ -7,7 +7,7 @@
 import { tileName, isWind, isDragon } from "./hong-engine.js";
 
 const W = 30, H = 40, FACE = 36.5;                               // the face, then the tile's edge below it
-const SLAB = 46, SIDE = 42;                                      // a slab: its height, and where its green back begins under the ivory side
+const SLAB = 46, SIDE = 39, GOLD = 41.3;                       // a slab: its height, where its ivory side ends and its gold line, then black porcelain to the foot
 const NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
 const ink = c => `style="fill:var(--hk-${c})"`;
 const CJK = `font-family="'Songti TC','STSong','Noto Serif CJK TC','Noto Serif TC','Hiragino Mincho ProN','PMingLiU','MingLiU',serif"`;
@@ -71,12 +71,13 @@ function face(k) {
   return `${text("梅蘭菊竹春夏秋冬"[k - 34], 15, 22, 16, c)}${sprig}<text x="25.8" y="8.2" font-size="7" font-weight="700" text-anchor="middle" font-family="system-ui,sans-serif" ${ink(c)}>${n}</text>`;
 }
 const blank = `<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="4" style="fill:var(--hk-back);stroke:var(--hk-edge);stroke-width:.8"/><rect x=".5" y=".5" width="${W - 1}" height="${FACE}" rx="3.6" style="fill:var(--hk-face);stroke:var(--hk-edge);stroke-width:.8"/>`;
-// a slab: the face, an ivory side under it (a shade darker), the green back showing at the foot; light along the face's top edge
-const slabBase = `<rect x=".5" y=".5" width="${W - 1}" height="${SLAB - 1}" rx="4" style="fill:var(--hk-back);stroke:var(--hk-edge);stroke-width:.8"/>`
+// a slab, from its face down: the ivory (face and side), a line of gold, black porcelain at the foot; light along the face's top edge
+const slabBase = `<rect x=".5" y=".5" width="${W - 1}" height="${SLAB - 1}" rx="4" style="fill:var(--hk-back);stroke:#000;stroke-width:.8"/>`
+  + `<rect x=".5" y=".5" width="${W - 1}" height="${GOLD}" rx="4" style="fill:var(--hk-gold);stroke:var(--hk-gold);stroke-width:.8"/>`
   + `<rect x=".5" y=".5" width="${W - 1}" height="${SIDE - 0.5}" rx="4" style="fill:color-mix(in srgb, var(--hk-face) 80%, var(--hk-edge));stroke:var(--hk-edge);stroke-width:.8"/>`
   + `<rect x=".5" y=".5" width="${W - 1}" height="${FACE}" rx="3.6" style="fill:var(--hk-face);stroke:var(--hk-edge);stroke-width:.8"/>`
   + `<path d="M4 1.7h${W - 8}" style="fill:none;stroke:#FFF;stroke-width:.9;stroke-linecap:round;opacity:.55"/>`;
-// the back of a tile standing in a hand, seen from across the table: its green back, the ivory of its top edge above
+// the back of a tile standing in a hand, seen from across the table: its black porcelain back inside a gold line, the ivory of its top edge above
 const slabBack = `<rect x=".5" y=".5" width="${W - 1}" height="${SLAB - 1}" rx="4" style="fill:var(--hk-back);stroke:var(--hk-edge);stroke-width:.8"/>`
   + `<rect x=".5" y=".5" width="${W - 1}" height="9" rx="3.6" style="fill:color-mix(in srgb, var(--hk-face) 80%, var(--hk-edge));stroke:var(--hk-edge);stroke-width:.8"/>`
   + `<rect x="4" y="13" width="${W - 8}" height="${SLAB - 17}" rx="2.4" style="fill:none;stroke:var(--hk-back-line);stroke-width:.8"/>`;

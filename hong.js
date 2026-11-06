@@ -1248,6 +1248,7 @@ function applyLook() {
 function showView() {
   const three = in3d();
   $("app").classList.toggle("hk3", three);
+  $("app").classList.toggle("glv", viewNow() === "gl");
   $("board").toggleAttribute("hidden", three);                   // (an svg has no .hidden)
   $("board3d").hidden = !three;
   table3d?.reset();

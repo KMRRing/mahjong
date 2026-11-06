@@ -5,14 +5,14 @@
   --hk-in: #2F6E58;                                             /* jade: the game's accent */
   --hk-in-soft: color-mix(in srgb, var(--hk-in) 15%, var(--sheet));
   --hk-felt: color-mix(in srgb, #4E8A5E 13%, var(--sheet));    /* the cloth: a warm green, never a grey */
-  --hk-face: #F7F1E1; --hk-edge: #B9A47A; --hk-back: #2F6B4F; --hk-back-line: #7FB59A;
+  --hk-face: #F7F1E1; --hk-edge: #B9A47A; --hk-back: #0F0F13; --hk-back-line: #C9A34E; --hk-gold: #D8AE55;
   --hk-ink: #1E2730; --hk-red: #B3302A; --hk-green: #24734A; --hk-blue: #244E8C;
 }
 @media (prefers-color-scheme: dark) {
-  html:not([data-mode="day"]) { --hk-in: #79C4A6; --hk-felt: color-mix(in srgb, #2F6E58 22%, var(--sheet)); --hk-face: #E9E2CF; --hk-edge: #7E6C4B; --hk-back: #24563F; --hk-back-line: #5E9C80; }
+  html:not([data-mode="day"]) { --hk-in: #79C4A6; --hk-felt: color-mix(in srgb, #2F6E58 22%, var(--sheet)); --hk-face: #E9E2CF; --hk-edge: #7E6C4B; --hk-back: #0F0F13; --hk-back-line: #C9A34E; --hk-gold: #D8AE55; }
 }
 /* night, set in Settings */
-html[data-mode="night"] { --hk-in: #79C4A6; --hk-felt: color-mix(in srgb, #2F6E58 22%, var(--sheet)); --hk-face: #E9E2CF; --hk-edge: #7E6C4B; --hk-back: #24563F; --hk-back-line: #5E9C80; }
+html[data-mode="night"] { --hk-in: #79C4A6; --hk-felt: color-mix(in srgb, #2F6E58 22%, var(--sheet)); --hk-face: #E9E2CF; --hk-edge: #7E6C4B; --hk-back: #0F0F13; --hk-back-line: #C9A34E; --hk-gold: #D8AE55; }
 
 .hk-mark { display: inline-block; }
 .hk-mark svg { width: 100%; height: 100%; display: block; }

@@ -166,5 +166,10 @@ html[data-theme="office"] .hk3-pool { border-color: color-mix(in srgb, #FFF 12%,
 }
 
 /* the third view (hong-gl.js): the scene fills the field under the plates, the banner and the tile read */
-.hk3-gl { position: absolute; inset: 0; z-index: 0; touch-action: none; display: block; }
+.hk3-gl { position: fixed; left: 0; top: 0; z-index: 0; touch-action: none; display: block; }
+/* the scene fills the screen; the page's own parts float over it (each its own layer, in order, the header's button last) */
+html #app.hk3.glv > * { position: relative; z-index: 1; }
+html #app.hk3.glv > .top { z-index: 3; }
+html #app.hk3.glv .hk3-hud { position: relative; z-index: 2; }
+html #app.hk3.glv .hk3-plate { background: color-mix(in srgb, var(--sheet) 92%, transparent); }
 .hk3-field.gl .hk3-stage { visibility: hidden; }

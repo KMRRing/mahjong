@@ -11,7 +11,7 @@ import * as T from "./vendor/three-run.js";
 import { faceMarkup } from "./hong-tiles.js";
 import { IN_FRAME } from "./suite.js";
 
-const TL = 4 / 3, THICK = 0.7, T_FACE = 0.2, BEVEL = 0.06;       // a tile in its widths: its length, its thickness, the ivory's, the edge's bevel
+const TL = 4 / 3, THICK = 0.7, T_BLACK = 0.35, T_GOLD = 0.175, T_FACE = 0.175, BEVEL = 0.05;       // a tile in its widths: its length, its thickness (half black porcelain, a quarter gold, a quarter ivory), the edge's bevel
 const KEY = "suite:hong-view";
 const PCF_SOFT = 2, ACES = 4;                                    // THREE.PCFSoftShadowMap and ACESFilmicToneMapping (the bundle exports neither)
 const FOV = 36, PITCH = [14, 88], DEFAULT_PITCH = 56;
@@ -73,7 +73,7 @@ const IVORY = ["#F7F0DC", "#EBE0C0"];
 
 // ---------- the pieces ----------
 /** A tile's slab: a bevelled box `w` x `h` x `d` (x, y, z) in one colour, its top face's uv spread over the top. */
-function slab(w, h, d, r, color, yBase) {
+function slab(w, h, d, r, yBase) {
   const g = new T.BoxGeometry(w, h, d, 3, 3, 3), P = g.attributes.position, N = g.attributes.normal, U = g.attributes.uv;
   const hw = w / 2, hh = h / 2, hd = d / 2, V = new T.Vector3(), Pc = new T.Vector3(), Nr = new T.Vector3();
   const ring = (v, half) => (Math.abs(Math.abs(v) - half) < 1e-6 ? v : Math.sign(v) * (half - r));    // the two inner columns go to the bevel's edge
@@ -90,30 +90,29 @@ function slab(w, h, d, r, color, yBase) {
     if (Nr.length() > 1e-6) { Nr.normalize(); V.copy(Pc).addScaledVector(Nr, r); N.setXYZ(i, Nr.x, Nr.y, Nr.z); }
     P.setXYZ(i, V.x, V.y + yBase, V.z);
   }
-  const col = new T.Color(color), arr = new Float32Array(P.count * 3);
-  for (let i = 0; i < P.count; i++) { arr[i * 3] = col.r; arr[i * 3 + 1] = col.g; arr[i * 3 + 2] = col.b; }
-  g.setAttribute("color", new T.Float32BufferAttribute(arr, 3));
   return g;
 }
-/** Two geometries as one (position, normal, uv, colour, index), so a tile's body is one draw. */
-function merge(a, b) {
-  const g = new T.BufferGeometry(), na = a.attributes.position.count;
-  for (const k of ["position", "normal", "uv", "color"]) {
-    const x = a.attributes[k].array, y = b.attributes[k].array, out = new Float32Array(x.length + y.length);
-    out.set(x); out.set(y, x.length);
-    g.setAttribute(k, new T.Float32BufferAttribute(out, a.attributes[k].itemSize));
-  }
-  const ia = a.index.array, ib = b.index.array, idx = new Uint32Array(ia.length + ib.length);
-  idx.set(ia);
-  for (let i = 0; i < ib.length; i++) idx[ia.length + i] = ib[i] + na;
-  g.setIndex(Array.from(idx));
+/** Geometries as one (position, normal, uv, index), one material group each, so a tile's body is one draw with a material per layer. */
+function merge(list) {
+  const g = new T.BufferGeometry(), idx = [];
+  const arrays = { position: [], normal: [], uv: [] };
+  let base = 0;
+  list.forEach((geo, m) => {
+    for (const k of Object.keys(arrays)) arrays[k].push(...geo.attributes[k].array);
+    const start = idx.length;
+    for (const i of geo.index.array) idx.push(i + base);
+    g.addGroup(start, idx.length - start, m);
+    base += geo.attributes.position.count;
+  });
+  for (const [k, v] of Object.entries(arrays)) g.setAttribute(k, new T.Float32BufferAttribute(v, k === "uv" ? 2 : 3));
+  g.setIndex(idx);
   return g;
 }
 
 export function createGL({ host, onFrame = () => {} }) {
   let R = null, scene = null, cam = null, canvas = null, failed = false;
   const items = new Map();                                       // key -> { group, to: {pos, quat}, kind, sig }
-  let W = 0, H = 0, view = null, fit = 20, plateMesh = null, plateSig = "", tableGroup = null, tableSig = "", wanted = true;
+  let W = 0, H = 0, sized = "", view = null, fit = 20, plateMesh = null, plateSig = "", tableGroup = null, tableSig = "", wanted = true;
   let want = false, raf = 0, last = 0, clock = 0, pulse = false;
   const mats = {}, faceMats = new Map(), geos = {};
 
@@ -128,8 +127,9 @@ export function createGL({ host, onFrame = () => {} }) {
     cam.near = Math.max(0.1, view.dist * 0.05); cam.far = view.dist * 6 + 60; cam.updateProjectionMatrix();
     redraw();
   }
+  let FW = 0, FH = 0;                                            // the field the table is framed in; the canvas itself fills the screen behind it
   function fitDist() {
-    const t = Math.tan((FOV * Math.PI) / 360), asp = W / Math.max(1, H), sp = Math.sin(((view?.pitch ?? DEFAULT_PITCH * Math.PI / 180)));
+    const t = Math.tan((FOV * Math.PI) / 360), asp = (FW || W) / Math.max(1, FH || H), sp = Math.sin(((view?.pitch ?? DEFAULT_PITCH * Math.PI / 180)));
     return Math.max(tableW / 2 / (t * asp), (tableH * sp / 2 + 1.6) / t) * 1.14;
   }
   let tableW = 18, tableH = 30;
@@ -220,24 +220,30 @@ export function createGL({ host, onFrame = () => {} }) {
     fill.position.set(6, 9, 18);
     scene.add(fill);
     // wood
-    const table = mahogany(1536, 1536, { base: [66, 38, 27], dark: [34, 18, 13], high: [104, 64, 44], seed: 3, rings: 16, pores: 0.35, bookMatch: true, contrast: 2.6 });
+    const table = mahogany(2048, 2048, { base: [54, 31, 22], dark: [26, 14, 10], high: [88, 54, 37], seed: 3, rings: 22, pores: 0.4, contrast: 2.4 });
     mats.table = new T.MeshStandardMaterial({ map: tex(table), roughness: 0.2, metalness: 0.0 });
     const edge = mahogany(512, 512, { base: [58, 36, 28], dark: [50, 31, 24], high: [70, 45, 35], seed: 8, rings: 14, pores: 0.25 });
     mats.edge = new T.MeshStandardMaterial({ map: tex(edge), roughness: 0.14, metalness: 0.0 });
-    mats.body = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.42, metalness: 0.0 });
-    const back = mahogany(192, 256, { base: [170, 82, 44], dark: [128, 56, 30], high: [196, 104, 58], seed: 21, rings: 5, pores: 0.4 });
-    const bc = back.getContext("2d");                            // an inset line, as on a real tile's back
-    bc.strokeStyle = "rgba(226,190,128,.7)"; bc.lineWidth = 3;
+    // the tile in layers, from its back: black porcelain, a gold leaf, the ivory (the engraved face goes on its top)
+    mats.black = new T.MeshStandardMaterial({ color: 0x0b0b0f, roughness: 0.08, metalness: 0.15 });
+    mats.gold = new T.MeshStandardMaterial({ color: 0xd9ab48, emissive: 0x4a3410, roughness: 0.26, metalness: 0.75 });
+    mats.ivory = new T.MeshStandardMaterial({ color: 0xf0e6c9, roughness: 0.32, metalness: 0.0 });
+    const back = document.createElement("canvas");
+    back.width = 192; back.height = 256;
+    const bc = back.getContext("2d"), bg = bc.createLinearGradient(0, 0, 192, 256);
+    bg.addColorStop(0, "#1b1b22"); bg.addColorStop(0.5, "#0b0b0f"); bg.addColorStop(1, "#15151b");
+    bc.fillStyle = bg; bc.fillRect(0, 0, 192, 256);
+    bc.strokeStyle = "#d6a84a"; bc.lineWidth = 3;                // the inset rectangle on a tile's back
     bc.beginPath(); bc.roundRect(14, 14, 164, 228, 12); bc.stroke();
-    mats.back = new T.MeshStandardMaterial({ map: tex(back), roughness: 0.3, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    mats.back = new T.MeshStandardMaterial({ map: tex(back), roughness: 0.1, metalness: 0.1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
     mats.mark = new T.MeshBasicMaterial({ color: 0xd9ac5c, transparent: true, opacity: 0.85 });
     mats.glow = new T.MeshBasicMaterial({ color: 0xf1c564, transparent: true, opacity: 0.55, depthWrite: false });
     mats.pool = new T.MeshBasicMaterial({ color: 0x1a0905, transparent: true, opacity: 0.07, depthWrite: false });
     mats.poolOn = new T.MeshBasicMaterial({ color: 0xf1c564, transparent: true, opacity: 0.1, depthWrite: false });
     mats.headTail = new T.MeshBasicMaterial({ color: 0xf1c564, transparent: true, opacity: 0.7, depthWrite: false });
     // a tile: the mahogany body and its ivory plate as one bevelled solid, centred on its own middle
-    const wd = 1, mahog = "#A8502B", ivory = "#EFE5C8", split = -THICK / 2 + (THICK - T_FACE);
-    geos.body = merge(slab(wd, THICK - T_FACE, TL, BEVEL, mahog, -THICK / 2 + (THICK - T_FACE) / 2), slab(wd, T_FACE, TL, BEVEL, ivory, split + T_FACE / 2));
+    const wd = 1, y0 = -THICK / 2;
+    geos.body = merge([slab(wd, T_BLACK, TL, BEVEL, y0 + T_BLACK / 2), slab(wd, T_GOLD, TL, BEVEL, y0 + T_BLACK + T_GOLD / 2), slab(wd, T_FACE, TL, BEVEL, y0 + T_BLACK + T_GOLD + T_FACE / 2)]);
     geos.decal = new T.PlaneGeometry(0.9, 0.9 * TL);
     geos.plate = new T.PlaneGeometry(1, 1);
     host.append(canvas);
@@ -254,14 +260,24 @@ export function createGL({ host, onFrame = () => {} }) {
     ctx.fillStyle = grad; ctx.fillRect(0, 0, FACE_W, FACE_H);
     const n = noise2(k + 5);
     for (let i = 0; i < 700; i++) { ctx.fillStyle = `rgba(120,95,50,${(n(i * 3.1, i * 1.7) * 0.05).toFixed(3)})`; ctx.fillRect((n(i, 7) * 997 % 1) * FACE_W, (n(3, i) * 991 % 1) * FACE_H, 2 + n(i, i) * 3, 1 + n(i, 2) * 2); }
-    const m = new T.MeshStandardMaterial({ map: tex(cv), roughness: 0.36, metalness: 0.0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const bump = document.createElement("canvas");               // white ivory, the engraving darker: a bump map from the same drawing
+    bump.width = FACE_W; bump.height = FACE_H;
+    const bx = bump.getContext("2d");
+    bx.fillStyle = "#fff"; bx.fillRect(0, 0, FACE_W, FACE_H);
+    const m = new T.MeshStandardMaterial({ map: tex(cv), bumpMap: tex(bump), bumpScale: 1.6, roughness: 0.3, metalness: 0.0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 40" width="${FACE_W}" height="${FACE_H}">${faceMarkup(k).replace(/var\(--hk-([a-z-]+)(?:,[^)]*)?\)/g, (_, v) => INK[v] ?? "#000")}</svg>`;
     const img = new Image();
     img.onload = () => {
+      bx.filter = "blur(1.2px) grayscale(1) contrast(1.6)";
+      bx.drawImage(img, FACE_W * 0.05, FACE_H * 0.05, FACE_W * 0.9, FACE_H * 0.9);
+      bx.filter = "none";
+      ctx.drawImage(img, FACE_W * 0.05 + 1, FACE_H * 0.05 + 1.5, FACE_W * 0.9, FACE_H * 0.9);   // a hairline of light on the cut's lower lip
+      ctx.globalAlpha = 0.9;
       ctx.drawImage(img, FACE_W * 0.05, FACE_H * 0.05, FACE_W * 0.9, FACE_H * 0.9);
+      ctx.globalAlpha = 1;
       ctx.strokeStyle = "rgba(170,140,90,.45)"; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.roundRect(5, 5, FACE_W - 10, FACE_H - 10, 14); ctx.stroke();
-      m.map.needsUpdate = true;
+      m.map.needsUpdate = true; m.bumpMap.needsUpdate = true;
       redraw();
     };
     img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -277,7 +293,7 @@ export function createGL({ host, onFrame = () => {} }) {
     if (tableGroup) { scene.remove(tableGroup); tableGroup.traverse(o => o.geometry?.dispose()); }
     tableGroup = new T.Group();
     const m = 1.6, w = wu + 2 * m, h = hu + 2 * m;
-    const top = new T.Mesh(slab(w, 1.4, h, 0.35, "#ffffff", -0.7 - 0.0), mats.table);
+    const top = new T.Mesh(slab(w, 1.4, h, 0.35, -0.7), mats.table);
     top.receiveShadow = true;
     // the slab's sides use the same top texture; its uv is the top's, so lay the grain across the whole top
     tableGroup.add(top);
@@ -293,11 +309,10 @@ export function createGL({ host, onFrame = () => {} }) {
       g.addColorStop(0, "rgba(255,236,205,0)"); g.addColorStop(0.28, "rgba(255,236,205,.55)"); g.addColorStop(0.52, "rgba(255,236,205,.08)"); g.addColorStop(0.7, "rgba(255,236,205,.3)"); g.addColorStop(1, "rgba(255,236,205,0)");
       c.fillStyle = g; c.fillRect(0, 0, 512, 512);
       c.globalCompositeOperation = "destination-out";
-      c.fillStyle = "rgba(0,0,0,.5)"; c.fillRect(250, 0, 14, 512);          // a mullion
       const v = c.createRadialGradient(256, 256, 120, 256, 256, 400);        // fades toward the edges
       v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,1)");
       c.fillStyle = v; c.fillRect(0, 0, 512, 512);
-      mats.sheen = new T.MeshBasicMaterial({ map: tex(cv), transparent: true, opacity: 0.22, depthWrite: false, blending: 2 });
+      mats.sheen = new T.MeshBasicMaterial({ map: tex(cv), transparent: true, opacity: 0.12, depthWrite: false, blending: 2 });
     }
     const sheen = new T.Mesh(geos.plate, mats.sheen);
     sheen.rotation.x = -Math.PI / 2; sheen.position.y = 0.004; sheen.scale.set(w * 0.96, h * 0.96, 1);
@@ -315,7 +330,7 @@ export function createGL({ host, onFrame = () => {} }) {
   const FACING = [null, new T.Vector3(1, 0, 0), new T.Vector3(0, 0, -1), new T.Vector3(-1, 0, 0)];   // toward the owner at rel 1, 2, 3
   /** A tile object for what it shows: the body, its face (k >= 0) and/or its polished back. */
   function makeTile(k, backUp) {
-    const g = new T.Group(), body = new T.Mesh(geos.body, mats.body);
+    const g = new T.Group(), body = new T.Mesh(geos.body, [mats.black, mats.gold, mats.ivory]);
     body.castShadow = true; body.receiveShadow = true;
     g.add(body);
     if (k >= 0) { const d = new T.Mesh(geos.decal, faceMat(k)); d.rotation.x = -Math.PI / 2; d.position.y = THICK / 2 + 0.004; g.add(d); }
@@ -474,12 +489,21 @@ export function createGL({ host, onFrame = () => {} }) {
   }
 
   // ---------- drawing, only while something moves ----------
-  function resize(w, h) {
-    if (!R || (w === W && h === H)) return;
-    W = w; H = h;
+  /** The canvas covers the whole screen (left of the field to the viewport's edge, top of the screen to the field's foot), the
+   *  table framed in the field as if it were the canvas: a wider vertical view, the picture moved to the field's middle. */
+  function resize(fw, fh) {
+    if (!R) return;
+    const r = host.getBoundingClientRect(), vw = document.documentElement.clientWidth, w = Math.round(vw), h = Math.max(Math.round(r.bottom), fh);
+    const key = `${w}x${h}:${Math.round(r.left)},${Math.round(r.top)}:${fw}x${fh}`;
+    if (key === sized) return;
+    sized = key;
+    FW = fw; FH = fh; W = w; H = h;
     R.setSize(w, h, false);
-    canvas.style.width = `${w}px`; canvas.style.height = `${h}px`;
-    cam.aspect = w / Math.max(1, h);
+    Object.assign(canvas.style, { position: "fixed", left: "0", top: "0", width: `${w}px`, height: `${h}px` });
+    cam.aspect = w / h;
+    cam.fov = (2 * Math.atan(Math.tan((FOV * Math.PI) / 360) * (h / fh)) * 180) / Math.PI;
+    const dx = r.left + fw / 2 - w / 2, dy = r.top + fh / 2 - h / 2;
+    cam.setViewOffset(w, h, -dx, -dy, w, h);
     if (view) { const z = view.dist / fit; fit = fitDist(); view.dist = fit * z; pose(); } else cam.updateProjectionMatrix();
   }
   function redraw() { want = true; if (!raf && wanted) raf = requestAnimationFrame(frame); }
