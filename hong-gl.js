@@ -41,8 +41,8 @@ function mahogany(w, h, { base, dark, high, seed = 1, rings = 14, pores = 0.5 })
       const ring = (y / h) * rings + warp, f = ring - Math.floor(ring);
       const band = Math.pow(Math.abs(Math.sin(f * Math.PI)), 1.7);                  // dark late wood, lighter early wood
       const fine = n2(x * 0.5, y * 0.05) * pores + n3(x * 0.06, y * 0.9) * 0.35;      // pores and fibres, stretched along the grain
-      const streak = n1(x * 0.0015 + 9, y * 0.05) > 0.62 ? 0.18 : 0;                // a figured streak
-      let m = 0.4 + 0.3 * band + 0.3 * (fine - 0.4) + streak;
+      const streak = 0;                // a figured streak
+      let m = 0.5 + 0.1 * (band - 0.5) + 0.14 * (fine - 0.4) + streak;
       m = Math.min(1, Math.max(0, m));
       const k = (y * w + x) * 4;
       for (let c = 0; c < 3; c++) {
@@ -127,7 +127,7 @@ export function createGL({ host, onFrame = () => {} }) {
   }
   function fitDist() {
     const t = Math.tan((FOV * Math.PI) / 360), asp = W / Math.max(1, H), sp = Math.sin(((view?.pitch ?? DEFAULT_PITCH * Math.PI / 180)));
-    return Math.max(tableW / 2 / (t * asp), (tableH * sp / 2 + 1.6) / t) * 1.2;
+    return Math.max(tableW / 2 / (t * asp), (tableH * sp / 2 + 1.6) / t) * 1.14;
   }
   let tableW = 18, tableH = 30;
   function resetView() {
@@ -214,12 +214,12 @@ export function createGL({ host, onFrame = () => {} }) {
     fill.position.set(6, 9, 18);
     scene.add(fill);
     // wood
-    const table = mahogany(1024, 1024, { base: [96, 34, 18], dark: [44, 14, 8], high: [140, 62, 34], seed: 3, rings: 38 });
-    mats.table = new T.MeshStandardMaterial({ map: tex(table, [2.2, 2.2]), bumpMap: tex(table, [2.2, 2.2]), bumpScale: 0.7, roughness: 0.3, metalness: 0.04 });
-    const edge = mahogany(256, 256, { base: [84, 28, 14], dark: [36, 11, 6], high: [118, 50, 26], seed: 8, rings: 14 });
+    const table = mahogany(2048, 2048, { base: [74, 29, 17], dark: [54, 21, 12], high: [96, 40, 23], seed: 3, rings: 30 });
+    mats.table = new T.MeshStandardMaterial({ map: tex(table), bumpMap: tex(table), bumpScale: 0.25, roughness: 0.34, metalness: 0.04 });
+    const edge = mahogany(512, 512, { base: [52, 19, 11], dark: [36, 13, 8], high: [70, 28, 16], seed: 8, rings: 14 });
     mats.edge = new T.MeshStandardMaterial({ map: tex(edge), roughness: 0.34, metalness: 0.03 });
     mats.body = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.42, metalness: 0.0 });
-    const back = mahogany(192, 256, { base: [138, 58, 32], dark: [86, 30, 16], high: [176, 84, 46], seed: 21, rings: 5, pores: 0.4 });
+    const back = mahogany(192, 256, { base: [170, 82, 44], dark: [128, 56, 30], high: [196, 104, 58], seed: 21, rings: 5, pores: 0.4 });
     const bc = back.getContext("2d");                            // an inset line, as on a real tile's back
     bc.strokeStyle = "rgba(226,190,128,.7)"; bc.lineWidth = 3;
     bc.beginPath(); bc.roundRect(14, 14, 164, 228, 12); bc.stroke();
@@ -230,7 +230,7 @@ export function createGL({ host, onFrame = () => {} }) {
     mats.poolOn = new T.MeshBasicMaterial({ color: 0xf1c564, transparent: true, opacity: 0.1, depthWrite: false });
     mats.headTail = new T.MeshBasicMaterial({ color: 0xf1c564, transparent: true, opacity: 0.7, depthWrite: false });
     // a tile: the mahogany body and its ivory plate as one bevelled solid, centred on its own middle
-    const wd = 1, mahog = "#8F3D22", ivory = "#EFE5C8", split = -THICK / 2 + (THICK - T_FACE);
+    const wd = 1, mahog = "#A8502B", ivory = "#EFE5C8", split = -THICK / 2 + (THICK - T_FACE);
     geos.body = merge(slab(wd, THICK - T_FACE, TL, BEVEL, mahog, -THICK / 2 + (THICK - T_FACE) / 2), slab(wd, T_FACE, TL, BEVEL, ivory, split + T_FACE / 2));
     geos.decal = new T.PlaneGeometry(0.9, 0.9 * TL);
     geos.plate = new T.PlaneGeometry(1, 1);
@@ -314,14 +314,24 @@ export function createGL({ host, onFrame = () => {} }) {
     makeTable(u(s.plane.w), u(s.plane.h));
     if (!view) { startView(); pose(); }
     const seen = new Set(), snap = items.size === 0 || s.jump;
+    // a side's standing hand: spread along its strip by the tile's width (the flat layout packs them by their thickness)
+    const side = new Map();
+    for (const r of [1, 3]) {
+      const hs = s.items.filter(i => i.g3?.kind === "strip" && i.g3.rel === r && i.g3.k < 0 && i.g3.part === "h").sort((a, b) => a.y - b.y);
+      if (!hs.length) continue;
+      const strip = s.strips[r], mid = hs.reduce((n, i) => n + i.y + i.h / 2, 0) / hs.length, wide = hs[0].w;
+      const pitch = Math.min(wide * 1.04, (strip.h * 0.96) / (hs.length + 0.4));
+      hs.forEach((i, n) => side.set(i.key, { y: mid + (n - (hs.length - 1) / 2) * pitch - i.h / 2, w: pitch / 1.04 }));
+    }
     pulse = false;
     for (const it of s.items) {
       const g3 = it.g3;
       if (!g3) continue;
       seen.add(it.key);
-      const x = X(it.x + it.w / 2), z = Z(it.y + it.h / 2), wu = u(it.w);
+      const sd = side.get(it.key), x = X(it.x + it.w / 2), z = Z((sd ? sd.y : it.y) + it.h / 2), wu = u(sd ? sd.w : it.w);
       let rec = items.get(it.key);
-      if (g3.kind === "pool") {
+      if (g3.kind === "pool") continue;
+      if (false) {
         const sig = `${g3.on}`;
         if (!rec) { const m = new T.Mesh(geos.plate, g3.on ? mats.poolOn : mats.pool); m.rotation.x = -Math.PI / 2; rec = { group: m, sig: "", flat: true }; items.set(it.key, rec); scene.add(m); }
         if (rec.sig !== sig) { rec.group.material = g3.on ? mats.poolOn : mats.pool; rec.sig = sig; }
@@ -343,9 +353,10 @@ export function createGL({ host, onFrame = () => {} }) {
         continue;
       }
       if (g3.kind === "strip" && k < 0) {                                   // another player's tile: standing, back toward the middle
-        quat = basis(FACING[g3.rel]);
-        if (g3.rel !== 2) scale = wu * 0.62;                       // a side's tiles are spaced by their thickness on the strip
-        pos = { x, y: (TL * scale) / 2, z };
+        // a side's hand is turned a little toward the player, so its backs can be seen and not just its edges
+        const a = (42 * Math.PI) / 180, f = g3.rel === 2 ? FACING[2] : new T.Vector3(g3.rel === 1 ? Math.cos(a) : -Math.cos(a), 0, -Math.sin(a));
+        quat = basis(f);
+                pos = { x, y: (TL * scale) / 2, z };
       } else {
         quat = new T.Quaternion().setFromEuler(new T.Euler(0, -((it.rot || 0) * Math.PI) / 180, 0));
         if (g3.last) { glowAt(`${it.key}~`, x, z, wu, g3.offer, it.rot); seen.add(`${it.key}~`); }
@@ -408,10 +419,13 @@ export function createGL({ host, onFrame = () => {} }) {
     plateMesh.scale.set(wu, hu, 1);
     if (sig === plateSig) return;
     plateSig = sig;
+    // the texture's size is fixed (a GPU texture can't change size): the plate is drawn at its own proportions and squeezed in
     const cv = plateMesh.material.map.image, pxw = 640, pxh = Math.max(200, Math.round((640 * hu) / wu));
-    cv.width = pxw; cv.height = pxh;
+    if (cv.width !== 1024) { cv.width = 1024; cv.height = 512; }
     const c = cv.getContext("2d");
-    c.clearRect(0, 0, pxw, pxh);
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.clearRect(0, 0, 1024, 512);
+    c.scale(1024 / pxw, 512 / pxh);
     // an inlaid plate: dark wood, a brass line
     c.fillStyle = "#26100a"; c.beginPath(); c.roundRect(4, 4, pxw - 8, pxh - 8, 26); c.fill();
     c.strokeStyle = "#c9a26a"; c.lineWidth = 3; c.beginPath(); c.roundRect(12, 12, pxw - 24, pxh - 24, 20); c.stroke();

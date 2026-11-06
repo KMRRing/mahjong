@@ -389,7 +389,7 @@ export function createTable3d(c) {
     const p = geo.plate, turn = G.phase === "act" ? G.turn : c.busy() ?? -1, offer = answering(G) ? claim(G) : null;
     const badges = [0, 1, 2, 3].map(r => { const seat = (me + r) % 4, w = E.windOf(G, seat); return { w: E.WINDS[w], dealer: w === 0, on: seat === turn }; });
     const ok = gl.set({
-      items: items(G, me), d: geo.d, plane: { w: fw, h: hp }, box: { w: fw, h: fh }, jump: plane.classList.contains("jump"),
+      items: items(G, me), strips: geo.strips, d: geo.d, plane: { w: fw, h: hp }, box: { w: fw, h: fh }, jump: plane.classList.contains("jump"),
       plate: p, centre: { badges, round: E.WINDS[G.round], left: E.wallLeft(G), offer: offer ? { tile: E.tileName(offer.k), who: c.nameOf(offer.seat), how: G.phase === "rob" ? "adds to a kong" : "lets go" } : null },
     });
     return ok;
