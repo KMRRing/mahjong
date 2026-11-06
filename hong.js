@@ -16,7 +16,7 @@ import { part, choice, toggle, action, line, onPause, isPaused } from "./menu.js
 import { ramp } from "./ramp.js";
 import { roundOver } from "./random.js";
 import { IN_FRAME, today } from "./suite.js";
-import { wants3D, onDefaultChange } from "./mode3d.js";
+import { flatMode, onDefaultChange } from "./mode3d.js";
 import { MODES, modeOf, clockText, strikeMarks, clockFor, runDown, graceAgain, timeUp, noteRun, bestsLine, endTitle } from "./rush-core.js";
 import { rushMenu } from "./rush-menu.js";
 import { busy } from "./loading.js";
@@ -65,7 +65,7 @@ const low = () => matchMedia(`${SIDEWAYS} and (max-height: 500px)`).matches;
 /** The view chosen in the menu: the table drawn flat (#board, below) or seen at an angle (#board3d, hong-3d.js). The tiles
  *  in your hand, your seat's line, the coach and the buttons are the same elements in both, drawn here. */
 const in3d = () => viewNow() !== "flat" && !!table3d;
-const viewNow = () => (opts.view === "gl" && !IN_FRAME ? "gl" : wants3D(opts.view === "gl" ? "" : opts.view, "3d") ? "3d" : "flat");
+const viewNow = () => (IN_FRAME ? "flat" : opts.view === "gl" ? "gl" : opts.view === "3d" ? "3d" : opts.view === "flat" ? "flat" : flatMode() ? "3d" : "gl");   // unchosen: the 3D scene, or the angled table on a device set to 2D
 let table3d = null;
 /** The ratio of a tile in your hand's height to its width: the 3D view's slabs are thicker (hong-tiles.js). */
 const tileRatio = () => (in3d() ? SLAB_H / TILE_W : 4 / 3);
@@ -570,8 +570,10 @@ function drawHand() {
 // what it would do at every decision, and the same word after a move it advised against; and, unless it's off, the
 // hand's review at its end.
 let hintFor = null;
-const coachOn = () => opts.coach === "on" || hintFor === keyNow();
-const checking = () => opts.coach === "check" || opts.coach === "on";
+/** The coach in force: at a table the host's Off switches it off for everyone, otherwise each player's own setting. */
+const coachMode = () => (together.room && S?.coach === "off" ? "off" : opts.coach);
+const coachOn = () => coachMode() === "on" || hintFor === keyNow();
+const checking = () => coachMode() === "check" || coachMode() === "on";
 /** The coach's word on your last move it would have made otherwise, until a turn of yours it agrees with (a claim you
  *  pass on as it would doesn't end it: there may be one before you've read it). */
 function lesson() {
@@ -620,7 +622,7 @@ function drawActions() {
     return;
   }
   moveButtons(box, legal);
-  if (!coachOn() && opts.coach !== "off") box.append(goBtn("Hint", () => { hintFor = keyNow(); askCoach(); render(); }, "quiet"));
+  if (!coachOn() && coachMode() !== "off") box.append(goBtn("Hint", () => { hintFor = keyNow(); askCoach(); render(); }, "quiet"));
 }
 /** Your moves now as buttons: a win, flowers, kongs and the tile you've lifted; offered a discard, its calls. */
 function moveButtons(box, legal) {
@@ -798,7 +800,7 @@ function showResult() {
 /** The coach's review of your hand: how often it would have done as you did (or valued yours as well), and the costliest
  *  decisions where it wouldn't: what yours was worth against its move, why, and its move's reason. */
 function review() {
-  if (!R.length || opts.coach === "off") return "";
+  if (!R.length || coachMode() === "off") return "";
   const decided = R.filter(e => e.coach), differs = decided.filter(differed);
   const worst = differs.slice().sort((a, b) => (b.gap ?? 0) - (a.gap ?? 0)).slice(0, 3);
   let html = `<h3 class="hk-sub">Your play</h3><p class="hk-review-lead">You and the coach agreed on ${decided.length - differs.length} of ${decided.length} decision${decided.length === 1 ? "" : "s"}${differs.length > worst.length ? `; the ${worst.length} that cost most:` : "."}</p>`;
@@ -1031,7 +1033,7 @@ function freshRoom(players, { ask = null, people = null } = {}) {
   const names = [0, 1, 2, 3].map(s => (humans.includes(s) ? "" : BOTS[s - 1]));
   for (const [, p] of Object.entries(players)) names[seatOfSlot(p.slot)] = p.name;
   const game = E.deal({ seed, dealer: firstDealer, round: 0, hand: 0, opts: { flowers: opts.flowers, minFan: opts.minFan, rounds: opts.rounds, scoring: opts.scoring } });
-  return { v: 1, app: APP, created: Date.now(), players, game, session: { v: 1, seed, firstDealer, names, humans, results: [], started: Date.now(), bots: strength() } };
+  return { v: 1, app: APP, created: Date.now(), players, game, session: { v: 1, seed, firstDealer, names, humans, results: [], started: Date.now(), bots: strength(), host: Object.values(players)[0]?.slot ?? null, coach: opts.coach === "off" ? "off" : "on" } };
 }
 let roomHand = null, roomGame = null;                            // the table's hand and game last drawn here, by their seeds
 function onRoomState(g) {
@@ -1097,7 +1099,7 @@ async function nextTogether() {
     if (game.hand !== hand || game.phase !== "over") return false;
     const cfg = E.nextHand(game, { seed: g.session.seed, firstDealer: g.session.firstDealer });
     if (cfg) g.game = E.deal(cfg);
-    else { const fresh = freshRoom(g.players, { people: g.session?.humans?.length }); g.game = fresh.game; g.session = fresh.session; g.created = Date.now(); }
+    else { const fresh = freshRoom(g.players, { people: g.session?.humans?.length }); g.game = fresh.game; g.session = { ...fresh.session, host: g.session.host, coach: g.session.coach }; g.created = Date.now(); }
   });
 }
 function drawPartner() {
@@ -1221,9 +1223,15 @@ function openMenu() {
   const cp = progressOf("hong", COURSE);
   part(body, "play").append(action(cp.done ? `Learn: ${cp.done} of ${cp.of} lessons done` : "Learn Mahjong, from the rules", () => course.open()));
   part(body, "settings").append(
-    choice("View", VIEWS, viewNow(), v => set("view", v)),
-    ...(viewNow() === "gl" ? [action("Reset camera", () => table3d.resetView())] : []),
-    toggle("Coach", opts.coach !== "off", v => { set("coach", v ? "on" : "off"); if (v) askCoach(); }),
+    toggle("Play in 2D (saves battery)", viewNow() !== "gl", v => set("view", v ? "3d" : "gl")),
+    ...(viewNow() === "gl" ? [action("Reset camera", () => table3d.resetView())] : [choice("2D layout", VIEWS.slice(0, 2), viewNow(), v => set("view", v))]),
+    ...(together.room && S?.host != null && S.host !== mySlot()
+      ? (S.coach === "off" ? [line("Coach: off, the host's choice")] : [toggle("Coach", coachMode() !== "off", v => { set("coach", v ? "on" : "off"); if (v) askCoach(); })])
+      : [toggle("Coach", opts.coach !== "off", v => {
+          set("coach", v ? "on" : "off");
+          if (together.room) together.act(g => { g.session.coach = v ? "on" : "off"; });   // the table's coach: the host's switch
+          if (v) askCoach();
+        })]),
   );
   const st = read(STATS, null), best = read(BEST, null), bestNoFan = read(BEST_NOFAN, null);
   if (st?.hands) part(body, "about").append(line(`${st.hands} hand${st.hands === 1 ? "" : "s"}: won ${st.wins} (${st.self} self-drawn), dealt in ${st.dealIns}${st.bestFan ? ` · biggest ${st.bestFan} fan` : ""}${st.games ? ` · ${st.games} game${st.games === 1 ? "" : "s"}, first in ${st.firsts}` : ""}${best != null ? ` · best game ${signed(best)}` : ""}${bestNoFan != null ? ` · best without fan ${signed(bestNoFan)}` : ""}`));

@@ -42,7 +42,7 @@ function mahogany(w, h, { base, dark, high, seed = 1, rings = 14, pores = 0.5 })
       const band = Math.pow(Math.abs(Math.sin(f * Math.PI)), 1.7);                  // dark late wood, lighter early wood
       const fine = n2(x * 0.5, y * 0.05) * pores + n3(x * 0.06, y * 0.9) * 0.35;      // pores and fibres, stretched along the grain
       const streak = 0;                // a figured streak
-      let m = 0.5 + 0.1 * (band - 0.5) + 0.14 * (fine - 0.4) + streak;
+      let m = 0.5 + 0.06 * (band - 0.5) + 0.07 * (fine - 0.4) + streak;
       m = Math.min(1, Math.max(0, m));
       const k = (y * w + x) * 4;
       for (let c = 0; c < 3; c++) {
@@ -210,14 +210,17 @@ export function createGL({ host, onFrame = () => {} }) {
     sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3;
     Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 26, bottom: -26, near: 1, far: 70 });
     scene.add(sun);
+    const gleam = new T.DirectionalLight(0xfff4e0, 0.4);
+    gleam.position.set(4, 14, -12);
+    scene.add(gleam);
     const fill = new T.DirectionalLight(0xffd9b0, 0.55);
     fill.position.set(6, 9, 18);
     scene.add(fill);
     // wood
-    const table = mahogany(2048, 2048, { base: [74, 29, 17], dark: [54, 21, 12], high: [96, 40, 23], seed: 3, rings: 30 });
-    mats.table = new T.MeshStandardMaterial({ map: tex(table), bumpMap: tex(table), bumpScale: 0.25, roughness: 0.34, metalness: 0.04 });
-    const edge = mahogany(512, 512, { base: [52, 19, 11], dark: [36, 13, 8], high: [70, 28, 16], seed: 8, rings: 14 });
-    mats.edge = new T.MeshStandardMaterial({ map: tex(edge), roughness: 0.34, metalness: 0.03 });
+    const table = mahogany(1024, 1024, { base: [70, 44, 34], dark: [62, 38, 29], high: [80, 52, 40], seed: 3, rings: 24, pores: 0.25 });
+    mats.table = new T.MeshStandardMaterial({ map: tex(table), roughness: 0.2, metalness: 0.0 });
+    const edge = mahogany(512, 512, { base: [58, 36, 28], dark: [50, 31, 24], high: [70, 45, 35], seed: 8, rings: 14, pores: 0.25 });
+    mats.edge = new T.MeshStandardMaterial({ map: tex(edge), roughness: 0.14, metalness: 0.0 });
     mats.body = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.42, metalness: 0.0 });
     const back = mahogany(192, 256, { base: [170, 82, 44], dark: [128, 56, 30], high: [196, 104, 58], seed: 21, rings: 5, pores: 0.4 });
     const bc = back.getContext("2d");                            // an inset line, as on a real tile's back

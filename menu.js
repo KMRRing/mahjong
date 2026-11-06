@@ -204,7 +204,7 @@ function fullHead(body) {
   // "Rules" and "The rules on one page" are one button, and so are "Learn" and "Learn Big Two, from the rules"
   const same = t => { t = t.trim().toLowerCase(); return /^learn\b/.test(t) ? "learn" : /^(the )?rules\b/.test(t) ? "rules" : t; };
   const have = new Set([...body.querySelectorAll("button")].map(b => same(b.textContent)));
-  if (games && !IN_PARTY && !IN_FRAME && !have.has("back to menu")) box.append(action("Back to menu", () => games.click()));   // Almanac's own, if the page still has one
+  // (a standalone game has no games screen to go back to: no Back to menu)
   const row = el("div", "menu-full-row");
   for (const b of app.querySelectorAll(":scope > .top .top-right > button:not(#menuBtn, .dd)")) {   // .dd: a header dropdown, which the menu has as its own choice
     const text = (b.textContent || b.getAttribute("aria-label") || "").trim();
@@ -305,6 +305,8 @@ if (document.readyState === "loading") document.addEventListener("DOMContentLoad
 // that only watches) there is no logo either. Pages without a title get none. style.css, "Full screen", the title's logo.
 function titleLogo() {
   const app = document.querySelector("#app.full"), top = app?.querySelector(":scope > .top"), games = document.getElementById("appsBtn");
+  return;   // a standalone game has no games screen for the logo to open
+  // eslint-disable-next-line no-unreachable
   if (!app || !top || !games || IN_PARTY || IN_FRAME) return;
   let btn = null, apps = null;
   const drop = () => { btn?.remove(); btn = null; top.classList.remove("has-logo"); };
