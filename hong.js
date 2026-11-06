@@ -1205,7 +1205,7 @@ function openMenu() {
   body.replaceChildren();
   const set = (k, v) => { opts[k] = v; write(OPTS, opts); applyLook(); render(); };
   // the copies, to check the coach elsewhere: this decision (or your last) and the game so far, in words
-  const copies = () => [action("Copy turn", copyTurn, "link"), action("Copy game", copyGame, "link")];
+  const copies = () => [];
   if (together.room) {
     part(body, "play").append(...copies());
     const others = [1, 2, 3].map(k => (me + k) % 4), list = a => (a.length < 2 ? a.join("") : `${a.slice(0, -1).join(", ")} and ${a.at(-1)}`);
