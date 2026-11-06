@@ -212,9 +212,21 @@ function fullHead(body) {
     row.append(action(text, () => b.click()));
   }
   if (row.children.length) box.append(row);
-  const pill = app.querySelector(".partner-pill")?.textContent.trim();
-  if (pill) box.append(line(pill));
   return box.children.length ? box : null;
+}
+
+/** A standalone game's way to get the newest copy: the version running, and a button that empties the offline copy and fetches afresh. */
+async function updatePart(body) {
+  if (body.querySelector(":scope > [data-refresh]")) return;
+  const box = el("div", "menu-refresh"), keys = await (window.caches ? caches.keys().catch(() => []) : []);
+  box.dataset.refresh = "1"; box.dataset.part = "about";
+  const v = keys.find(k => k.startsWith("crates-"))?.slice(7);
+  box.append(line(`Version ${v || "not stored on this device"}`), action("Refresh game", async () => {
+    try { for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); } catch { /* none */ }
+    try { for (const k of await caches.keys()) await caches.delete(k); } catch { /* none */ }
+    location.replace(`${location.pathname}?fresh=${Date.now()}`);
+  }, "link"));
+  if (!body.querySelector(":scope > [data-refresh]")) body.append(box);
 }
 
 let shaping = false;
@@ -229,6 +241,7 @@ function shape(body) {
       if (part) { part.dataset.head = name; body.prepend(part); }
     }
     if (partyPart && !body.querySelector(":scope > [data-party]")) body.prepend(partyPart());
+    if (body.id === "menuBody") updatePart(body);   // (its append sets shape off once more, which finds it there)
     if (!body.querySelector(":scope > [data-full]")) { const head = fullHead(body); if (head) body.prepend(head); }   // first of all
     // parts in the standard order, each with its heading (Play needs none: it's the top), after anything unmarked
     for (const box of body.querySelectorAll(":scope > [data-part]")) {

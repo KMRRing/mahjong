@@ -31,7 +31,7 @@ function noise2(seed) {
  * Mahogany on a canvas: long grain along x with rings that wander, fine pores, a polished sheen. base/dark/high are [r, g, b].
  * Returns the canvas; the bump map is the same one.
  */
-function mahogany(w, h, { base, dark, high, seed = 1, rings = 14, pores = 0.5 }) {
+function mahogany(w, h, { base, dark, high, seed = 1, rings = 14, pores = 0.5, bookMatch = false, contrast = 1 }) {
   const cv = document.createElement("canvas");
   cv.width = w; cv.height = h;
   const ctx = cv.getContext("2d"), img = ctx.createImageData(w, h), n1 = noise2(seed), n2 = noise2(seed + 17), n3 = noise2(seed + 91);
@@ -42,7 +42,7 @@ function mahogany(w, h, { base, dark, high, seed = 1, rings = 14, pores = 0.5 })
       const band = Math.pow(Math.abs(Math.sin(f * Math.PI)), 1.7);                  // dark late wood, lighter early wood
       const fine = n2(x * 0.5, y * 0.05) * pores + n3(x * 0.06, y * 0.9) * 0.35;      // pores and fibres, stretched along the grain
       const streak = 0;                // a figured streak
-      let m = 0.5 + 0.06 * (band - 0.5) + 0.07 * (fine - 0.4) + streak;
+      let m = 0.5 + contrast * (0.06 * (band - 0.5) + 0.07 * (fine - 0.4)) + streak;
       m = Math.min(1, Math.max(0, m));
       const k = (y * w + x) * 4;
       for (let c = 0; c < 3; c++) {
@@ -53,6 +53,9 @@ function mahogany(w, h, { base, dark, high, seed = 1, rings = 14, pores = 0.5 })
     }
   }
   ctx.putImageData(img, 0, 0);
+  if (bookMatch) {                                                // two leaves of one log opened like a book: the right is the left's mirror
+    ctx.save(); ctx.translate(w, 0); ctx.scale(-1, 1); ctx.drawImage(cv, 0, 0, w / 2, h, 0, 0, w / 2, h); ctx.restore();
+  }
   return cv;
 }
 const tex = (cv, repeat = null) => {
@@ -217,7 +220,7 @@ export function createGL({ host, onFrame = () => {} }) {
     fill.position.set(6, 9, 18);
     scene.add(fill);
     // wood
-    const table = mahogany(1024, 1024, { base: [70, 44, 34], dark: [62, 38, 29], high: [80, 52, 40], seed: 3, rings: 24, pores: 0.25 });
+    const table = mahogany(1536, 1536, { base: [66, 38, 27], dark: [34, 18, 13], high: [104, 64, 44], seed: 3, rings: 16, pores: 0.35, bookMatch: true, contrast: 2.6 });
     mats.table = new T.MeshStandardMaterial({ map: tex(table), roughness: 0.2, metalness: 0.0 });
     const edge = mahogany(512, 512, { base: [58, 36, 28], dark: [50, 31, 24], high: [70, 45, 35], seed: 8, rings: 14, pores: 0.25 });
     mats.edge = new T.MeshStandardMaterial({ map: tex(edge), roughness: 0.14, metalness: 0.0 });
@@ -282,6 +285,23 @@ export function createGL({ host, onFrame = () => {} }) {
     const line = (x, z, lw, lh) => { const l = new T.Mesh(geos.plate, mats.mark); l.rotation.x = -Math.PI / 2; l.position.set(x, 0.012, z); l.scale.set(lw, lh, 1); tableGroup.add(l); };
     const ix = w / 2 - 0.55, iz = h / 2 - 0.55, t = 0.05;
     line(0, -iz, 2 * ix, t); line(0, iz, 2 * ix, t); line(-ix, 0, t, 2 * iz); line(ix, 0, t, 2 * iz);
+    // the lacquer's reflection: a soft window and its mullions laid over the wood, added to it
+    if (!mats.sheen) {
+      const cv = document.createElement("canvas");
+      cv.width = 512; cv.height = 512;
+      const c = cv.getContext("2d"), g = c.createLinearGradient(0, 0, 512, 512);
+      g.addColorStop(0, "rgba(255,236,205,0)"); g.addColorStop(0.28, "rgba(255,236,205,.55)"); g.addColorStop(0.52, "rgba(255,236,205,.08)"); g.addColorStop(0.7, "rgba(255,236,205,.3)"); g.addColorStop(1, "rgba(255,236,205,0)");
+      c.fillStyle = g; c.fillRect(0, 0, 512, 512);
+      c.globalCompositeOperation = "destination-out";
+      c.fillStyle = "rgba(0,0,0,.5)"; c.fillRect(250, 0, 14, 512);          // a mullion
+      const v = c.createRadialGradient(256, 256, 120, 256, 256, 400);        // fades toward the edges
+      v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,1)");
+      c.fillStyle = v; c.fillRect(0, 0, 512, 512);
+      mats.sheen = new T.MeshBasicMaterial({ map: tex(cv), transparent: true, opacity: 0.22, depthWrite: false, blending: 2 });
+    }
+    const sheen = new T.Mesh(geos.plate, mats.sheen);
+    sheen.rotation.x = -Math.PI / 2; sheen.position.y = 0.004; sheen.scale.set(w * 0.96, h * 0.96, 1);
+    tableGroup.add(sheen);
     scene.add(tableGroup);
     tableW = w; tableH = h;
   }
@@ -446,9 +466,9 @@ export function createGL({ host, onFrame = () => {} }) {
       c.fillStyle = "#f3e8cc"; c.font = `600 ${pxh * 0.12}px system-ui, sans-serif`; c.fillText(q.offer.who, pxw / 2, pxh * 0.5);
       c.fillStyle = "#c9a26a"; c.font = `500 ${pxh * 0.085}px system-ui, sans-serif`; c.fillText(q.offer.how, pxw / 2, pxh * 0.66);
     } else {
-      c.fillStyle = "#f3e8cc"; c.font = `700 ${pxh * 0.4}px ${SERIF}`; c.fillText(q.round, pxw * 0.36, pxh * 0.5);
-      c.font = `700 ${pxh * 0.36}px system-ui, sans-serif`; c.fillStyle = "#f1c564"; c.fillText(String(q.left), pxw * 0.66, pxh * 0.46);
-      c.font = `500 ${pxh * 0.1}px system-ui, sans-serif`; c.fillStyle = "#c9a26a"; c.fillText("in the wall", pxw * 0.66, pxh * 0.74);
+      c.fillStyle = "#f3e8cc"; c.font = `700 ${pxh * 0.34}px ${SERIF}`; c.fillText(q.round, pxw * 0.32, pxh * 0.42);
+      c.font = `700 ${pxh * 0.3}px system-ui, sans-serif`; c.fillStyle = "#f1c564"; c.fillText(String(q.left), pxw * 0.64, pxh * 0.38);
+      c.font = `500 ${pxh * 0.085}px system-ui, sans-serif`; c.fillStyle = "#c9a26a"; c.fillText("in the wall", pxw * 0.64, pxh * 0.58);
     }
     plateMesh.material.map.needsUpdate = true;
   }
