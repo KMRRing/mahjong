@@ -1,0 +1,27 @@
+/* A table's sheets (table-ui.js): the invitation with its QR code, and the name a guest goes by. Linked by table-ui.js
+   itself, so a page with a table needn't. */
+dialog.tb-invite { max-height: 92vh; max-height: 92svh; overflow-y: auto; overscroll-behavior: contain; }
+.tb-scan { display: grid; justify-items: center; gap: .6rem; margin: .8rem 0 .2rem; }
+.tb-qr { width: min(64vw, 15rem); aspect-ratio: 1; padding: .5rem; background: #fff; border: 1.5px solid var(--brass); border-radius: 6px; box-sizing: border-box; }
+.tb-qr svg { display: block; width: 100%; height: 100%; }
+.tb-how { display: grid; justify-items: center; gap: .45rem; text-align: center; }
+.tb-note { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+.tb-code { margin: 0; font-size: 2rem; font-weight: 800; font-stretch: var(--wide); letter-spacing: calc(.3em * var(--track)); text-transform: var(--caps); padding-left: .3em; }
+.tb-links { display: flex; gap: .5rem; }
+.tb-links .btn { min-height: 2.75rem; }
+.tb-players { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+.tb-players li { display: flex; align-items: center; gap: .55rem; min-height: 2.5rem; padding: 0 .2rem; border-bottom: 1px solid var(--rule); }
+.tb-players li.away .tb-who { color: var(--ink-soft); }
+.tb-who { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tb-dot { width: .55rem; height: .55rem; border-radius: 50%; background: #2F7D5B; flex: none; }
+.tb-players li.away .tb-dot { background: transparent; border: 1.5px solid var(--ink-soft); box-sizing: border-box; }
+.tb-remove { width: 2.25rem; height: 2.25rem; }
+.tb-status { margin: .6rem 0 0; color: var(--ink-soft); font-size: .9rem; min-height: 1.2em; }
+.tb-name .tb-note { margin: .6rem 0 .8rem; }
+@media (orientation: landscape) and (min-width: 700px) {
+  .tb-scan { grid-template-columns: auto 1fr; align-items: center; justify-items: start; }
+  .tb-how { justify-items: start; text-align: left; }
+  .tb-qr { width: min(40vh, 15rem); }
+}
+@media (prefers-color-scheme: dark) { html:not([data-mode="day"]) .tb-dot { background: #7FC2A8; } }
+html[data-mode="night"] .tb-dot { background: #7FC2A8; }

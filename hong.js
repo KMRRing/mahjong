@@ -9,6 +9,7 @@ import { installTiles, tileSvg, SLAB_H, TILE_W } from "./hong-tiles.js";
 import { createTable3d } from "./hong-3d.js";
 import { bindSwitcher, APPS } from "./apps.js";
 import { createTogether, seatsOf, seatOfSlot, peopleSeats, runsElsewhere } from "./together.js";
+import { openTable, inviteSheet, tableInAddress, setTableParam } from "./table-ui.js";
 import { GAMES, roomInAddress, joiningWords } from "./rooms.js";
 import "./pwa.js";
 import { part, choice, toggle, action, line, onPause, isPaused } from "./menu.js";
@@ -1022,10 +1023,11 @@ const seated = () => { joining?.(); joining = null; };
 const BACKUP_MS = 4000;
 const backup = () => !!together.room && runsElsewhere(roomData, together.room.uid);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+let invitedFor = null;                                          // how many people the host's lobby seated, while its game is dealt
 /** A new game at the table, for so many people: the request's (a party's), or the table's as it was. */
 function freshRoom(players, { ask = null, people = null } = {}) {
   const seed = (Math.random() * 2 ** 32) >>> 0, firstDealer = Math.floor(Math.random() * 4);
-  const humans = peopleSeats(people ?? ask?.people);
+  const humans = peopleSeats(people ?? ask?.people ?? invitedFor);
   const names = [0, 1, 2, 3].map(s => (humans.includes(s) ? "" : BOTS[s - 1]));
   for (const [, p] of Object.entries(players)) names[seatOfSlot(p.slot)] = p.name;
   const game = E.deal({ seed, dealer: firstDealer, round: 0, hand: 0, opts: { flowers: opts.flowers, minFan: opts.minFan, rounds: opts.rounds, scoring: opts.scoring } });
@@ -1139,6 +1141,56 @@ const together = createTogether({
   },
 });
 
+// ---------- inviting: a lobby, then the room the game is played in ----------
+// This game stands alone (no games screen or Party), so Invite players opens a lobby table of its own: its code in the
+// address, a sheet with the link and its QR code, and each guest who opens it sits down there. The host deals the game
+// for the people seated (two to four; the computer plays the other seats) in a room, and writes the room's code into the
+// lobby, which sends every guest's page to it (a late guest too, while a seat is free).
+let going = false;
+const lobby = openTable({
+  game: "hongtable", app: 1, max: 4, toast,
+  onState: b => {
+    invite.update();
+    if (b?.room && !lobby.me?.host && !going) goToRoom(b.room);
+  },
+  onLeave: () => invite.close(),
+});
+const invite = inviteSheet(lobby, {
+  title: "Invite players",
+  note: "Scan with the camera, or open the link: no app needed. Up to four play; the computer plays any seat nobody takes.",
+  deal: { label: "Deal the game", ready: ps => (ps.length >= 2 ? true : "Waiting for someone to sit down"), run: () => dealLobby() },
+});
+async function inviteNow() {
+  if (IN_FRAME) return;
+  if (lobby.code) { invite.open(); return; }
+  if (await lobby.start()) invite.open();
+}
+async function dealLobby() {
+  const n = Math.min(4, Math.max(2, lobby.players.length));
+  invitedFor = n;
+  const done = busy("Dealing the game", { delay: 0 });
+  try {
+    if (!(await together.start())) return;
+    setTableParam(null);                                         // a reload goes to the room, not back to the lobby
+    await lobby.act(b => { b.room = together.room.code; b.people = n; });
+  } finally { invitedFor = null; done(); }
+}
+/** A guest's page: out of the lobby and into the room the host dealt. */
+async function goToRoom(code) {
+  going = true;
+  invite.close();
+  joining = busy("Joining the table", { delay: 0 });
+  await lobby.leave();
+  together.join(code).then(ok => { if (!ok) { seated(); load(); } });
+}
+function joinLobby() {
+  joining = busy("Joining the table", { delay: 0 });
+  lobby.joinAddress().then(ok => {
+    seated();
+    if (ok) invite.open(); else load();
+  });
+}
+
 // ---------- the menu ----------
 let toastTimer = null;
 function toast(msg, ms = 2400) {
@@ -1165,7 +1217,7 @@ function openMenu() {
     rushMenu(body, { pick: rushPick, start: () => { write(RUSH_NEXT, rushPick); rushPick = null; startRush(); }, results: rush.over ? endRush : null, back: leaveRush,
       bests: read(RUSH_BEST, {}), daily: read(RUSH_DAILY, {}), day: today(), inFrame: IN_FRAME });
   }
-  else part(body, "play").append(action("New game", () => newGame(), "primary"), action("Puzzle rush", () => startRush(), ""), ...copies());
+  else part(body, "play").append(action("New game", () => newGame(), "primary"), ...(IN_FRAME ? [] : [action("Invite players", inviteNow)]), action("Puzzle rush", () => startRush(), ""), ...copies());
   const cp = progressOf("hong", COURSE);
   part(body, "play").append(action(cp.done ? `Learn: ${cp.done} of ${cp.of} lessons done` : "Learn Mahjong, from the rules", () => course.open()));
   part(body, "settings").append(
@@ -1462,4 +1514,5 @@ const code = roomInAddress();
 if (code) {
   joining = busy(joiningWords(), { delay: 0 });
   together.join(code).then(ok => { if (!ok) { seated(); load(); } });
-} else load();
+} else if (tableInAddress() && !IN_FRAME) joinLobby();
+else load();
